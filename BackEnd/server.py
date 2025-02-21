@@ -16,7 +16,7 @@ app.add_middleware(
 )
 
 # Directory to store uploaded files
-UPLOAD_DIR = "/home/ubuntu/uploads"
+UPLOAD_DIR = "/home/ec2-user/uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)  # Ensure directory exists
 
 @app.post("/upload/")
