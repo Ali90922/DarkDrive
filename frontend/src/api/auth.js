@@ -75,3 +75,21 @@ axios.interceptors.request.use(
 		return Promise.reject(error);
 	}
 );
+
+export const loginUser = async (userData) => {
+	try {
+		const response = await axios.post(`${API_URL}/users/login`, userData);
+		return response.data;
+	} catch (err) {
+		throw err.response.data;
+	}
+};
+
+export const signupUser = async (userData) => {
+	try {
+		const response = await axios.post(`${API_URL}/users/signup`, userData);
+		return response.data;
+	} catch (err) {
+		throw err.response.data;
+	}
+};
