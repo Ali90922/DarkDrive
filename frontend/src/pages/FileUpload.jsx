@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { uploadFiles } from '../../api/transfer.js';
+import { uploadFiles } from '../api/transfer.js';
 
 const FileUpload = () => {
   const [dragActive, setDragActive] = useState(false);
