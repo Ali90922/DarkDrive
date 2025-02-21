@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+@theme {
+	--color-background: "darkgray";
+	--color-primary: "black";
+	--color-secondary: "gray";
+	--color-tertiary: "lightgray";
+	--color-accent: "darkblue";
+}
+
+@layer base {
+	body {
+		@apply text-tertiary bg-background;
+	}
+}
+
+@layer components {
+	input {
+		@apply border-2 rounded-full p-2 pl-4;
+	}
+}
