@@ -16,6 +16,12 @@ const Navbar = () => {
             Home
           </Link>
           <Link 
+            to="/sign-up" 
+            className="text-gray-300 hover:text-white transition-colors duration-200"
+          >
+            Signup
+          </Link>
+          <Link 
             to="/dashboard" 
             className="text-gray-300 hover:text-white transition-colors duration-200"
           >
