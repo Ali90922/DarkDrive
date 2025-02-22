@@ -2,7 +2,7 @@
 
 @theme {
 	--color-primary: black;
-	--color-background: darkgray;
+	--color-background: #0a0a0a;
 	--color-secondary: gray;
 	--color-tertiary: lightgray;
 	--color-accent: darkblue;
@@ -21,7 +21,6 @@
 	}
 
 	h2 {
-
 		@apply text-2xl text-center;
 	}
 
@@ -31,6 +30,14 @@
 
 	nav ul {
 		@apply flex gap-8;
+	}
+
+	img {
+		@apply rounded-lg;
+	}
+
+	input {
+		@apply border-2 rounded-lg p-2;
 	}
 
 	.navLink {
