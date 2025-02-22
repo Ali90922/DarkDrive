@@ -93,10 +93,7 @@ const FileUpload = () => {
 							))}
 						</div>
 
-						<button
-							onClick={handleUpload}
-							className='mt-4 px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors duration-200'
-						>
+						<button onClick={handleUpload} className='mt-4'>
 							Upload Files
 						</button>
 					</div>
@@ -113,11 +110,6 @@ const FileUpload = () => {
 					>
 						{uploadStatus}
 					</div>
-				)}
-
-				{/* Server Response - Display Encrypted File Info */}
-				{sessionStorage.getItem("encryptionKey") != "" && (
-					<p>Encryption Key: {sessionStorage.getItem("encryptionKey")}</p>
 				)}
 			</div>
 		</div>

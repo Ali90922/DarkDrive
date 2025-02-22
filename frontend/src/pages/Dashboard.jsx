@@ -55,10 +55,13 @@ const Dashboard = () => {
 				<FileUpload />
 			</section>
 			<section className='p-6 w-5/6'>
-				<ul className='max-h-screen flex flex-col gap-4 border-gray-700'>
+				<ul className='max-h-[90vh] overflow-y-auto custom-scrollbar flex flex-col gap-2 border-gray-700'>
 					{files.length > 0 ? (
 						files.map((file, index) => (
-							<li key={index} className='flex justify-between border-b-2 py-1 transition'>
+							<li
+								key={index}
+								className='flex justify-between bg-white/10 p-2 px-4 rounded-md hover:bg-white/5 transition'
+							>
 								<p>{file.slice(0, -4)}</p>
 								<button
 									onClick={() => handleDownload(file)}
