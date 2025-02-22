@@ -9,7 +9,7 @@ const Navbar = () => {
 
 	return (
 		<nav>
-			<Link to="/"><h1 className-"font-display">DarkDrive</h1></Link>
+			<Link to="/"><h1 className="font-display">DarkDrive</h1></Link>
 			<ul>
 				{navLinks.map((link) => (
 					<Link
