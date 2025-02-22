@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { signupUser } from "../api/auth";
 
+import VerificationModal from "../components/VerificationModal";
+
 const SignUpPage = () => {
+	const [showModal, setShowModal] = useState(false);
 	const [formData, setFormData] = useState({
 		email: "",
 		password: "",
@@ -32,7 +35,7 @@ const SignUpPage = () => {
 			if (!result.success) {
 				setError(result.error);
 			}
-			// Handle successful signup - you might want to redirect or show a success message
+			setShowModal(true);
 		} catch (err) {
 			setError("An error occurred during signup");
 		} finally {
@@ -42,6 +45,7 @@ const SignUpPage = () => {
 
 	return (
 		<div className='min-h-screen bg-gray-900 flex items-center justify-center p-4'>
+			{showModal && <VerificationModal />}
 			<form
 				onSubmit={handleSubmit}
 				className='w-full max-w-md bg-gray-800 rounded-2xl border border-gray-700 p-8 shadow-xl space-y-6'
