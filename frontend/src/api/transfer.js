@@ -4,7 +4,7 @@ import { getToken } from "./auth"; // Assuming auth.js is in the same directory
 const uploadEndpoint = "http://98.83.145.159:8000/upload/";
 const fileNameEndpoint = "http://18.220.232.235:8000/users/upload/";
 
-export const uploadFiles = async (files, email) => {
+export const uploadFiles = async (files) => {
 	try {
 		const results = [];
 
@@ -21,6 +21,9 @@ export const uploadFiles = async (files, email) => {
 					"Content-Type": "multipart/form-data", // Specify the content type for file upload
 				},
 			});
+
+			localStorage.setItem("encryptionKey", response.data.encryption_key);
+			console.log(response);
 
 			if (response.status !== 200) {
 				throw new Error(`Upload failed for ${file.name}`);

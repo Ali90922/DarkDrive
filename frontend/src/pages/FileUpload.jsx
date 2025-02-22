@@ -43,6 +43,7 @@ const FileUpload = () => {
 		try {
 			const email = localStorage.getItem("email");
 			const result = await uploadFiles(files, email);
+			console.log(result);
 
 			if (result.success) {
 				setUploadStatus("Upload successful!");
@@ -62,10 +63,10 @@ const FileUpload = () => {
 			<div>
 				<div
 					className={`
-            border-2 border-dashed rounded-lg p-8
-            ${dragActive ? "border-blue-500 bg-blue-500/10" : "border-gray-600 bg-gray-800"}
-            transition-colors duration-200
-          `}
+						border-2 border-dashed rounded-lg p-8
+						${dragActive ? "border-blue-500 bg-blue-500/10" : "border-gray-600 bg-gray-800"}
+						transition-colors duration-200
+					`}
 					onDragEnter={handleDrag}
 					onDragLeave={handleDrag}
 					onDragOver={handleDrag}
@@ -120,35 +121,8 @@ const FileUpload = () => {
 				)}
 
 				{/* Server Response - Display Encrypted File Info */}
-				{serverResponse && (
-					<div className='mt-6 p-4 bg-gray-900 rounded-lg'>
-						<h3 className='text-lg font-semibold text-green-400'>
-							✅ File Encrypted Successfully!
-						</h3>
-						<p className='text-gray-300'>
-							<strong>🔒 Encrypted Filename:</strong> {serverResponse.encrypted_filename}
-						</p>
-						<p className='text-gray-300'>
-							<strong>🔑 Encryption Key:</strong>{" "}
-							<span className='font-mono bg-gray-800 px-2 py-1 rounded'>
-								{serverResponse.encryption_key}
-							</span>
-						</p>
-						<p className='text-gray-300'>
-							<strong>📥 Download Encrypted File:</strong>{" "}
-							<a
-								href={serverResponse.download_url}
-								target='_blank'
-								rel='noopener noreferrer'
-								className='text-blue-400 underline hover:text-blue-300'
-							>
-								Click here to download
-							</a>
-						</p>
-						<p className='text-red-400 text-sm mt-2'>
-							⚠ Save this key securely! It will NOT be stored on the server.
-						</p>
-					</div>
+				{localStorage.getItem("encryptionKey") != "" && (
+					<p>Encryption Key: {localStorage.getItem("encryptionKey")}</p>
 				)}
 			</div>
 		</div>
