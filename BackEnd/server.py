@@ -9,10 +9,10 @@ import uuid
 # Create FastAPI instance
 app = FastAPI()
 
-# Enable CORS for all origins (Modify for security)
+# Enable CORS for all origins (modify for security as needed)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Change this to your frontend's domain for security
+    allow_origins=["*"],  # Replace "*" with your frontend's domain for production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -31,7 +31,7 @@ async def upload_file(file: UploadFile = File(...)):
     with open(temp_file_location, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     
-    # Generate encryption key
+    # Generate encryption key and create a Fernet instance
     encryption_key = Fernet.generate_key()
     fernet = Fernet(encryption_key)
     
@@ -42,12 +42,12 @@ async def upload_file(file: UploadFile = File(...)):
     # Encrypt the file data
     encrypted_data = fernet.encrypt(original_data)
     
-    # Define encrypted file location (with .enc extension)
+    # Define encrypted file location with a .enc extension
     encrypted_file_location = os.path.join(UPLOAD_DIR, f"{file.filename}.enc")
     with open(encrypted_file_location, "wb") as encrypted_file:
         encrypted_file.write(encrypted_data)
     
-    # Optionally, remove the original unencrypted file for security
+    # Remove the original unencrypted file for security
     os.remove(temp_file_location)
     
     # Generate a unique success token
@@ -67,18 +67,18 @@ async def upload_file(file: UploadFile = File(...)):
     # Return the JSON response to the user
     return response
 
-@app.get("/download/{filename}")
+@app.get("/download/{filename:path}")
 async def download_file(filename: str):
     """
     Download the encrypted file from the server.
-    Expects the filename (without .enc extension) as a path parameter.
+    Expects the original filename (without the '.enc' extension) as a path parameter.
     """
     file_path = os.path.join(UPLOAD_DIR, f"{filename}.enc")
     
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="File not found")
     
-    # Return the file for download.
+    # Return the file for download
     return FileResponse(
         path=file_path,
         media_type="application/octet-stream",
