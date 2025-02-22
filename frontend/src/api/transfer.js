@@ -1,8 +1,10 @@
 import axios from "axios";
-import { getToken } from "./auth"; // Assuming auth.js is in the same directory
 
-const uploadEndpoint = "http://98.83.145.159:8000/upload/";
-const fileNameEndpoint = "http://18.220.232.235:8000/users/upload/";
+const FILE_API_URL = import.meta.env.VITE_FILE_API_URL;
+const AUTH_API_URL = import.meta.env.VITE_AUTH_API_URL;
+
+const uploadEndpoint = `${FILE_API_URL}/upload/`;
+const fileNameEndpoint = `${AUTH_API_URL}/users/upload/`;
 
 export const uploadFiles = async (files) => {
 	try {
@@ -30,9 +32,7 @@ export const uploadFiles = async (files) => {
 			}
 
 			// Once the file is uploaded, send just the file name to the fileNameEndpoint
-			const uploadUrl = `http://18.220.232.235:8000/users/upload/${encodeURIComponent(
-				localStorage.getItem("email")
-			)}`;
+			const uploadUrl = `${fileNameEndpoint}${encodeURIComponent(localStorage.getItem("email"))}`;
 
 			const response2 = await axios.post(uploadUrl, formData, {
 				headers: {

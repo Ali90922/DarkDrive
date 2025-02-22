@@ -1,9 +1,8 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import FileUpload from "./pages/FileUpload"; // Adjust path as needed
-import Dashboard from "./pages/Dashboard";
+import Admin from "./pages/Admin";
 import LoginPage from "./pages/LoginPage";
-import Home from "./pages/Home";
+import Dashboard from "./pages/Dashboard";
 import Landing from "./pages/Landing";
 import MainLayout from "./components/MainLayout";
 
@@ -14,8 +13,8 @@ const App = () => {
 				<Routes>
 					<Route path='/' element={<Landing />} />
 					<Route path='/login' element={<LoginPage />} />
-					<Route path='/user' element={<Home />} />
-					<Route path='/dashboard' element={<Dashboard />} />
+					<Route path='/user' element={<Dashboard />} />
+					<Route path='/admin' element={<Admin />} />
 				</Routes>
 			</MainLayout>
 		</Router>

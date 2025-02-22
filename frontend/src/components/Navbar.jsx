@@ -4,10 +4,8 @@ import { Link } from "react-router-dom";
 const Navbar = () => {
 	const navLinks = [
 		{ name: "Home", path: "/" },
-		{ name: "User Dash", path: "/home" },
-		{ name: "Sign Up", path: "/sign-up" },
 		{ name: "Login", path: "/login" },
-		{ name: "Dashboard", path: "/dashboard" },
+		{ name: "Admin", path: "/admin" },
 	];
 
 	return (
