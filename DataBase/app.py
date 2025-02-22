@@ -219,6 +219,8 @@ def get_user_files(email: str):
         files_list = []
     
     conn.close()
-    
+
+      # Also retrieve the verified status (0 or 1)
+    verified_status = user["verified"]  # This is typically 0 or 1 in the DB    
     # Return a JSON object, e.g. { "files": ["file1.pdf", "file2.png"] }
-    return {"files": files_list}
+    return {"files": files_list,"verified": verified_status}
