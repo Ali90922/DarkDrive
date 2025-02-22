@@ -26,6 +26,11 @@ ChartJS.register(
 );
 
 const AdminDashboard = () => {
+	const JUVENTUS_URL = import.meta.env.VITE_JUVENTUS;
+	const HASHIR_URL = import.meta.env.VITE_HASHIR;
+	const MILAN_URL = import.meta.env.VITE_MILAN;
+	const RAYAN_URL = import.meta.env.VITE_RAYAN;
+
 	// State for metrics and averages
 	const [metrics, setMetrics] = useState([]);
 	const [averages, setAverages] = useState({
@@ -34,54 +39,77 @@ const AdminDashboard = () => {
 		disk_usage: 0,
 	});
 
+	// Function to fetch machine metrics
+	const getMachineMetrics = async () => {
+		const machines = [
+			{ id: 1, name: "Ali - 1 (Juventus)", url: JUVENTUS_URL },
+			{ id: 2, name: "Hashir - 1", url: HASHIR_URL },
+			{ id: 3, name: "Ali Nawaz - 2 (Milan)", url: MILAN_URL },
+			{
+				id: 4,
+				name: "Rayan Kashif - 1 (DataBase Store)",
+				url: RAYAN_URL,
+			},
+		];
+
+		try {
+			// Fetch data for each machine
+			const responses = await Promise.all(
+				machines.map(async (machine) => {
+					const res = await fetch(machine.url);
+
+					if (!res.ok) {
+						throw new Error(`Failed to fetch data for ${machine.name}`);
+					}
+					const data = await res.json();
+					return { machine: machine.name, metrics: data };
+				})
+			);
+
+			// Return the combined results
+			return responses;
+		} catch (error) {
+			console.error("Error fetching machine metrics:", error);
+			return null;
+		}
+	};
+
+	// Fetch data when component mounts
 	useEffect(() => {
-		// Mock API data - Replace this with actual API call
 		const fetchData = async () => {
-			const mockData = [
-				{
-					id: 1,
-					hostname: "ip-172-31-41-173.ec2.internal",
-					cpu: { cpu_usage_percent: 55.2 },
-					memory: { memory_usage_percent: 60.3 },
-					disk: { disk_usage_percent: 75.1 },
-				},
-				{
-					id: 2,
-					hostname: "ip-172-31-41-174.ec2.internal",
-					cpu: { cpu_usage_percent: 40.5 },
-					memory: { memory_usage_percent: 35.7 },
-					disk: { disk_usage_percent: 60.4 },
-				},
-				// Add more machines as needed...
-			];
-			setMetrics(mockData);
+			const fetchedMetrics = await getMachineMetrics();
+			if (fetchedMetrics) {
+				setMetrics(fetchedMetrics);
 
-			// Calculate averages
-			const cpuUsage =
-				mockData.reduce((acc, machine) => acc + machine.cpu.cpu_usage_percent, 0) / mockData.length;
-			const memoryUsage =
-				mockData.reduce((acc, machine) => acc + machine.memory.memory_usage_percent, 0) /
-				mockData.length;
-			const diskUsage =
-				mockData.reduce((acc, machine) => acc + machine.disk.disk_usage_percent, 0) /
-				mockData.length;
+				// Calculate averages
+				const cpuUsage =
+					fetchedMetrics.reduce((acc, machine) => acc + machine.metrics.cpu_usage_percent, 0) /
+					fetchedMetrics.length;
+				const memoryUsage =
+					fetchedMetrics.reduce((acc, machine) => acc + machine.metrics.memory_usage_percent, 0) /
+					fetchedMetrics.length;
+				const diskUsage =
+					fetchedMetrics.reduce((acc, machine) => acc + machine.metrics.disk_usage_percent, 0) /
+					fetchedMetrics.length;
 
-			setAverages({
-				cpu_usage: cpuUsage,
-				memory_usage: memoryUsage,
-				disk_usage: diskUsage,
-			});
+				setAverages({
+					cpu_usage: cpuUsage,
+					memory_usage: memoryUsage,
+					disk_usage: diskUsage,
+				});
+			}
 		};
 
 		fetchData();
 	}, []);
 
+	// CPU Chart Data
 	const cpuChartData = {
-		labels: ["Machine 1", "Machine 2"], // Adjust as per your data
+		labels: metrics.map((machine) => machine.machine),
 		datasets: [
 			{
 				label: "CPU Usage (%)",
-				data: metrics.map((machine) => machine.cpu.cpu_usage_percent),
+				data: metrics.map((machine) => machine.metrics.cpu_usage_percent),
 				fill: false,
 				backgroundColor: "rgb(255, 99, 132)",
 				borderColor: "rgba(255, 99, 132, 0.2)",
@@ -90,15 +118,16 @@ const AdminDashboard = () => {
 		],
 	};
 
+	// Disk Chart Data
 	const diskChartData = {
 		labels: ["Used", "Free"],
 		datasets: [
 			{
 				data: [
-					metrics.reduce((acc, machine) => acc + machine.disk.disk_usage_percent, 0) /
-						metrics.length, // Example: Average disk usage
+					metrics.reduce((acc, machine) => acc + machine.metrics.disk_usage_percent, 0) /
+						metrics.length,
 					100 -
-						metrics.reduce((acc, machine) => acc + machine.disk.disk_usage_percent, 0) /
+						metrics.reduce((acc, machine) => acc + machine.metrics.disk_usage_percent, 0) /
 							metrics.length,
 				],
 				backgroundColor: ["#ff6347", "#28a745"],
@@ -108,6 +137,7 @@ const AdminDashboard = () => {
 		],
 	};
 
+	// Chart Options for CPU
 	const cpuChartOptions = {
 		responsive: true,
 		plugins: {
@@ -151,6 +181,7 @@ const AdminDashboard = () => {
 		},
 	};
 
+	// Chart Options for Disk Usage
 	const diskChartOptions = {
 		responsive: true,
 		plugins: {
@@ -175,6 +206,7 @@ const AdminDashboard = () => {
 		},
 	};
 
+	// Stat Card Component
 	const StatCard = ({ title, value, unit = "" }) => (
 		<div className='bg-gray-800 p-6 rounded-xl shadow-lg'>
 			<h3 className='text-gray-400 text-sm font-medium mb-2'>{title}</h3>
@@ -185,26 +217,28 @@ const AdminDashboard = () => {
 		</div>
 	);
 
+	// Machine Card Component
 	const MachineCard = ({ machine }) => (
 		<div className='bg-gray-800 p-6 rounded-xl shadow-lg'>
 			<h3 className='text-lg font-semibold text-white mb-4'>{machine.hostname.split(".")[0]}</h3>
 			<div className='space-y-3'>
 				<div className='flex justify-between items-center'>
 					<span className='text-gray-400'>CPU</span>
-					<span className='text-white'>{machine.cpu.cpu_usage_percent}%</span>
+					<span className='text-white'>{machine.metrics.cpu_usage_percent}%</span>
 				</div>
 				<div className='flex justify-between items-center'>
 					<span className='text-gray-400'>Memory</span>
-					<span className='text-white'>{machine.memory.memory_usage_percent}%</span>
+					<span className='text-white'>{machine.metrics.memory_usage_percent}%</span>
 				</div>
 				<div className='flex justify-between items-center'>
 					<span className='text-gray-400'>Disk</span>
-					<span className='text-white'>{machine.disk.disk_usage_percent}%</span>
+					<span className='text-white'>{machine.metrics.disk_usage_percent}%</span>
 				</div>
 			</div>
 		</div>
 	);
 
+	// Loading state
 	if (!metrics || !averages) {
 		return (
 			<div className='flex items-center justify-center min-h-screen bg-gray-900'>

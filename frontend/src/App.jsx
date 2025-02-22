@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Admin from "./pages/Admin";
 import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
-import Landing from "./pages/Landing";
+import Home from "./pages/Home";
 import MainLayout from "./components/MainLayout";
 
 const App = () => {
@@ -11,7 +11,7 @@ const App = () => {
 		<Router>
 			<MainLayout>
 				<Routes>
-					<Route path='/' element={<Landing />} />
+					<Route path='/' element={<Home />} />
 					<Route path='/login' element={<LoginPage />} />
 					<Route path='/user' element={<Dashboard />} />
 					<Route path='/admin' element={<Admin />} />

@@ -1,5 +1,5 @@
-import SignUpPage from "./SignUp";
-import Login from "./Login";
+import SignUpPage from "../components/SignUp";
+import Login from "../components/Login";
 import { useState } from "react";
 
 const LoginPage = () => {
@@ -18,7 +18,7 @@ const LoginPage = () => {
 						<p>Already Registered?</p>
 						<button
 							onClick={() => toggleSignUp()}
-							className='p-0 bg-transparent text-blue-500 underline'
+							className='p-0 bg-transparent text-accent underline'
 						>
 							Login
 						</button>
@@ -31,7 +31,7 @@ const LoginPage = () => {
 						<p>New User?</p>
 						<button
 							onClick={() => toggleSignUp()}
-							className='p-0 bg-transparent text-blue-500 underline'
+							className='p-0 bg-transparent text-accent underline'
 						>
 							Register Now
 						</button>
