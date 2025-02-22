@@ -21,7 +21,7 @@
 	}
 
 	h2 {
-		@apply bg-gray-800 p-4 text-xl text-center;
+		@apply text-xl text-center;
 	}
 
 	nav {
