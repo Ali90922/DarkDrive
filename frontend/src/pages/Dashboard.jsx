@@ -11,10 +11,8 @@ const Home = () => {
   useEffect(() => {
     const getUserData = async () => {
       try {
-        // Use the GET /users/files/{email} endpoint from your server.py
         const email = localStorage.getItem("email") || "demo@example.com";
         const response = await axios.get(`${API_URL}/users/files/${email}`);
-        // Expected response: { files: ["JD-Q2.asm.enc", "test.txt.enc", ...] }
         console.log("Files received:", response.data.files);
         setFiles(response.data.files);
       } catch (err) {
@@ -24,6 +22,27 @@ const Home = () => {
 
     getUserData();
   }, []);
+
+  // Function to download file using axios
+  const handleDownload = async (file) => {
+    try {
+      const response = await axios.get(`${API_URL}/download/${encodeURIComponent(file)}`, {
+        responseType: "blob", // important for handling binary data
+      });
+      // Create a URL from the blob
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", file); // specify the file name
+      document.body.appendChild(link);
+      link.click();
+      // Clean up
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Error downloading file:", err);
+    }
+  };
 
   return (
     <main className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 min-h-screen bg-gray-900 text-white">
@@ -40,16 +59,13 @@ const Home = () => {
                 key={index}
                 className="flex justify-between p-2 border-b border-gray-600 last:border-b-0 hover:bg-gray-700 transition"
               >
-                {/* Display the exact filename, e.g. "JD-Q2.asm.enc" */}
                 <p>{file}</p>
-                <a
-                  // This uses the GET /download/{filename:path} endpoint from your server.py
-                  href={`${API_URL}/download/${encodeURIComponent(file)}`}
-                  download={file}
+                <button
+                  onClick={() => handleDownload(file)}
                   className="text-blue-400 cursor-pointer"
                 >
                   Download
-                </a>
+                </button>
               </li>
             ))
           ) : (
