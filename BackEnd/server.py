@@ -55,7 +55,7 @@ async def upload_file(file: UploadFile = File(...)):
     
     # Create the response dictionary
     response = {
-        "filename": file.filename,
+        "filename": f"{file.filename}.enc",  # We'll store the .enc name in the response
         "status": "File uploaded and encrypted successfully",
         "encryption_key": encryption_key.decode(),
         "token": success_token
@@ -70,19 +70,20 @@ async def upload_file(file: UploadFile = File(...)):
 @app.get("/download/{filename:path}")
 async def download_file(filename: str):
     """
-    Download the encrypted file from the server.
-    Expects the original filename (without the '.enc' extension) as a path parameter.
+    Download the file from the server using exactly the filename passed in the path.
+    This will look for /home/ec2-user/uploads/{filename}.
+    So if filename == 'Ali@Buhler.pdf.enc', it will look for exactly that file in UPLOAD_DIR.
     """
-    file_path = os.path.join(UPLOAD_DIR, f"{filename}.enc")
+    file_path = os.path.join(UPLOAD_DIR, filename)
     
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="File not found")
     
-    # Return the file for download
+    # Return the file for download (still encrypted, if .enc)
     return FileResponse(
         path=file_path,
         media_type="application/octet-stream",
-        filename=f"{filename}.enc"
+        filename=filename
     )
 
 if __name__ == "__main__":
