@@ -13,8 +13,8 @@ const App = () => {
 		<Router>
 			<MainLayout>
 				<Routes>
-					<Route path='/' element={<Home />} />
-					<Route path='/landing' element={<Landing />} />
+					<Route path='/' element={<Landing />} />
+					<Route path='/home' element={<Home />} />
 					<Route path='/upload' element={<FileUpload />} />
 					<Route path='/login' element={<LoginPage />} />
 					<Route path='/dashboard' element={<Dashboard />} />
