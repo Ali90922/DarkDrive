@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 import sqlite3
 import bcrypt
@@ -6,6 +6,7 @@ import smtplib
 from email.message import EmailMessage
 from pydantic import BaseModel
 from fastapi.responses import RedirectResponse
+
 
 app = FastAPI()
 
@@ -116,6 +117,7 @@ def login(user: User):
        raise HTTPException(status_code=400, detail="Invalid email or password")
 
     conn.close()
+    
     return {"message": "Login successful", "email": user.email}
 
 # ✅ Get All Users
@@ -167,3 +169,25 @@ def clear_users():
     conn.close()
     
     return {"message": "All users deleted and ID counter reset"}
+
+
+@app.post("/users/upload/{id}")
+def upload_file(email: str, file: UploadFile = File(...)):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Check if the user exists
+    user = cursor.execute("SELECT * FROM users WHERE id = ?", (email,)).fetchone()
+    if not user:
+        conn.close()
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Store only the filename in DB (not the file content)
+    existing_files = user["files"]
+    new_files = file.filename if existing_files is None else f"{existing_files},{file.filename}"
+
+    cursor.execute("UPDATE users SET files = ? WHERE id = ?", (new_files, email))
+    conn.commit()
+    conn.close()
+
+    return {"message": "Filename stored successfully", "filename": file.filename}
