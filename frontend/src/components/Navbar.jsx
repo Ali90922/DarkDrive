@@ -9,7 +9,7 @@ const Navbar = () => {
 
 	return (
 		<nav>
-			<h1>DarkDrive</h1>
+			<Link to="/">DarkDrive</Link>
 			<ul>
 				{navLinks.map((link) => (
 					<Link
