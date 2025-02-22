@@ -17,7 +17,7 @@
 
 @layer components {
 	h1 {
-		@apply text-2xl font-bold;
+		@apply text-3xl font-bold;
 	}
 
 	h2 {
@@ -41,10 +41,14 @@
 	}
 
 	button {
-		@apply py-4 px-8 bg-accent rounded-full transition-colors duration-200 cursor-pointer;
+		@apply py-4 px-8 bg-accent rounded-lg transition-colors duration-200 cursor-pointer;
 	}
 
 	button:hover {
 		@apply bg-highlight;
+	}
+
+	footer {
+		@apply bg-primary p-8 w-full;
 	}
 }
