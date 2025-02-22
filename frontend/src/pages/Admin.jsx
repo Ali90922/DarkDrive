@@ -43,13 +43,13 @@ const AdminDashboard = () => {
 	const getMachineMetrics = async () => {
 		const machines = [
 			{ id: 1, name: "Ali - 1 (Juventus)", url: JUVENTUS_URL },
-			{ id: 2, name: "Hashir - 1", url: HASHIR_URL },
-			{ id: 3, name: "Ali Nawaz - 2 (Milan)", url: MILAN_URL },
-			{
-				id: 4,
-				name: "Rayan Kashif - 1 (DataBase Store)",
-				url: RAYAN_URL,
-			},
+			// { id: 2, name: "Hashir - 1", url: HASHIR_URL },
+			// { id: 3, name: "Ali Nawaz - 2 (Milan)", url: MILAN_URL },
+			// {
+			// 	id: 4,
+			// 	name: "Rayan Kashif - 1 (DataBase Store)",
+			// 	url: RAYAN_URL,
+			// },
 		];
 
 		try {
@@ -220,7 +220,7 @@ const AdminDashboard = () => {
 	// Machine Card Component
 	const MachineCard = ({ machine }) => (
 		<div className='bg-gray-800 p-6 rounded-xl shadow-lg'>
-			<h3 className='text-lg font-semibold text-white mb-4'>{machine.hostname.split(".")[0]}</h3>
+			<h3 className='text-lg font-semibold text-white mb-4'>{machine.hostname}</h3>
 			<div className='space-y-3'>
 				<div className='flex justify-between items-center'>
 					<span className='text-gray-400'>CPU</span>
