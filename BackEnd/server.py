@@ -6,80 +6,93 @@ import os
 from cryptography.fernet import Fernet
 import uuid
 
-# Create FastAPI instance
 app = FastAPI()
 
-# Enable CORS for all origins (modify for security as needed)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Replace "*" with your frontend's domain for production
+    allow_origins=["*"],  # For production, replace "*" with your real domain(s)
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Directory to store uploaded files
 UPLOAD_DIR = "/home/ec2-user/uploads"
-os.makedirs(UPLOAD_DIR, exist_ok=True)  # Ensure directory exists
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @app.post("/upload/")
 async def upload_file(file: UploadFile = File(...)):
-    # Define temporary file location
+    """
+    1) Save the uploaded file as a temp file.
+    2) Encrypt it using Fernet.
+    3) Save only the encrypted version with .enc appended.
+    4) Delete the original cleartext file.
+    5) Return JSON with "filename": "<original>.enc".
+    """
     temp_file_location = os.path.join(UPLOAD_DIR, file.filename)
     
-    # Save the uploaded file temporarily
+    # Save the uploaded file
     with open(temp_file_location, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     
-    # Generate encryption key and create a Fernet instance
+    # Generate encryption key
     encryption_key = Fernet.generate_key()
     fernet = Fernet(encryption_key)
     
-    # Read the original file content
+    # Read the original file data
     with open(temp_file_location, "rb") as original_file:
         original_data = original_file.read()
-    
-    # Encrypt the file data
+
+    # Encrypt
     encrypted_data = fernet.encrypt(original_data)
     
-    # Define encrypted file location with a .enc extension
-    encrypted_file_location = os.path.join(UPLOAD_DIR, f"{file.filename}.enc")
+    # Define the new filename with ".enc" appended
+    encrypted_filename = file.filename + ".enc"
+    encrypted_file_location = os.path.join(UPLOAD_DIR, encrypted_filename)
+
+    # Save the encrypted file
     with open(encrypted_file_location, "wb") as encrypted_file:
         encrypted_file.write(encrypted_data)
     
-    # Remove the original unencrypted file for security
+    # Remove the original (unencrypted) file
     os.remove(temp_file_location)
     
-    # Generate a unique success token
-    success_token = str(uuid.uuid4())
-    
-    # Create the response dictionary
+    # Prepare a JSON response
     response = {
-        "filename": f"{file.filename}.enc",  # We'll store the .enc name in the response
+        "filename": encrypted_filename,
         "status": "File uploaded and encrypted successfully",
-        "encryption_key": encryption_key.decode(),
-        "token": success_token
+        "encryption_key": encryption_key.decode(),  # If you need the key for later usage
+        "token": str(uuid.uuid4()),
     }
-    
-    # Print the response to the console
     print("Response:", response)
-    
-    # Return the JSON response to the user
     return response
+
+@app.get("/users/files/{email}")
+async def get_user_files(email: str):
+    """
+    Return a list of ALL .enc files in UPLOAD_DIR.
+    (No real filtering by user here—just a demo.)
+    The frontend uses this to display a list of files.
+    """
+    all_files = os.listdir(UPLOAD_DIR)
+    # In this example, let's only return files ending in ".enc"
+    enc_files = [f for f in all_files if f.endswith(".enc")]
+    
+    # If you wanted to filter by user, you'd need a naming convention or DB link here.
+    
+    return {"files": enc_files}
 
 @app.get("/download/{filename:path}")
 async def download_file(filename: str):
     """
-    Download the file from the server using exactly the filename passed in the path.
-    This will look for /home/ec2-user/uploads/{filename}.
-    So if filename == 'Ali@Buhler.pdf.enc', it will look for exactly that file in UPLOAD_DIR.
+    Download EXACTLY the file name requested, e.g. "JD-Q2.asm.enc".
+    We do NOT append ".enc" here. If the file on disk is "JD-Q2.asm.enc",
+    you must request /download/JD-Q2.asm.enc
     """
     file_path = os.path.join(UPLOAD_DIR, filename)
     
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail="File not found")
     
-    # Return the file for download (still encrypted, if .enc)
     return FileResponse(
         path=file_path,
         media_type="application/octet-stream",
