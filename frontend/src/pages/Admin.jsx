@@ -30,6 +30,8 @@ const AdminDashboard = () => {
 	const MILAN_URL = import.meta.env.VITE_MILAN;
 	const HASHIR_URL = import.meta.env.VITE_HASHIR;
 	const RAYAN_URL = import.meta.env.VITE_RAYAN;
+	const HAYYAN_URL = import.meta.env.VITE_HAYYAN;
+	const AZURE_URL = import.meta.env.VITE_AZURE;
 
 	// State for metrics and averages
 	const [metrics, setMetrics] = useState([]);
@@ -47,6 +49,8 @@ const AdminDashboard = () => {
 			{ id: 2, name: "Ali Nawaz - 2 (Milan)", url: MILAN_URL },
 			// { id: 3, name: "Hashir - 1", url: HASHIR_URL },
 			{ id: 4, name: "Rayan Kashif - 1 (DataBase Store)", url: RAYAN_URL },
+			{ id: 5, name: "Hayyan1", url: HAYYAN_URL },
+			{ id: 6, name: "Azure", url: AZURE_URL },
 		];
 
 		try {
@@ -131,7 +135,7 @@ const AdminDashboard = () => {
 		fetchData();
 
 		// Set up polling every 30 seconds
-		const interval = setInterval(fetchData, 5000);
+		const interval = setInterval(fetchData, 2000);
 		return () => clearInterval(interval);
 	}, []);
 
