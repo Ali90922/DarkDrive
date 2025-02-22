@@ -1,1 +1,22 @@
 @import "tailwindcss";
+
+@theme {
+	--color-primary: black;
+	--color-background: darkgray;
+	--color-secondary: gray;
+	--color-tertiary: lightgray;
+	--color-accent: darkblue;
+	--color-highlight: blue;
+}
+
+@layer base {
+	body {
+		@apply text-tertiary;
+	}
+}
+
+@layer components {
+	nav {
+		@apply bg-primary flex justify-between p-8;
+	}
+}
