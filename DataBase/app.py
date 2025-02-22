@@ -1,0 +1,169 @@
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+import sqlite3
+import bcrypt
+import smtplib
+from email.message import EmailMessage
+from pydantic import BaseModel
+from fastapi.responses import RedirectResponse
+
+app = FastAPI()
+
+# Enable CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins (Change this in production)
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
+)
+
+# Database Connection
+def get_db_connection():
+    conn = sqlite3.connect("users.db")
+    conn.row_factory = sqlite3.Row
+    return conn
+
+# User Model
+class User(BaseModel):
+    email: str
+    password: str
+    linkedin: str = None
+    files: str = None
+
+# Password Hashing Functions
+def hash_password(password: str) -> str:
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password.encode(), salt).decode()
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return bcrypt.checkpw(plain_password.encode(), hashed_password.encode())
+
+# Function to Send Verification Email
+def send_verification_email(email: str):
+    verification_link = f"http://18.220.232.235:8000/users/verify/{email}"
+    msg = EmailMessage()
+    msg["Subject"] = "Verify Your Email"
+    msg["From"] = "rayankash71@gmail.com"  # Replace with your email
+    msg["To"] = email
+    msg.set_content(f"Click the link to verify your email: {verification_link}")
+
+    try:
+        with smtplib.SMTP("smtp.gmail.com", 587) as smtp:
+            smtp.starttls()
+            smtp.login("rayankash71@gmail.com", "vqrfdutlhbiagdox")  # Replace with credentials
+            smtp.send_message(msg)
+    except Exception as e:
+        print(f"Email sending failed: {e}")
+
+# ✅ Signup with Email Verification
+@app.post("/users/signup")
+def signup(user: User):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Check if email exists
+    existing_user = cursor.execute("SELECT * FROM users WHERE email = ?", (user.email,)).fetchone()
+    if existing_user:
+        conn.close()
+        raise HTTPException(status_code=400, detail="Email already registered")
+
+    # Hash password and insert user with `verified = 0`
+    hashed_password = hash_password(user.password)
+    cursor.execute("INSERT INTO users (email, password, linkedin, files, verified) VALUES (?, ?, ?, ?, ?)",
+                   (user.email, hashed_password, user.linkedin, user.files, 0))
+    conn.commit()
+    conn.close()
+
+    send_verification_email(user.email)  # Send verification email
+
+    return {"message": "Signup successful! Please verify your email."}
+
+# ✅ Verify Email Endpoint
+@app.get("/users/verify/{email}")
+def verify_email(email: str):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    user = cursor.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
+    if not user:
+        conn.close()
+        raise HTTPException(status_code=404, detail="User not found")
+
+    cursor.execute("UPDATE users SET verified = 1 WHERE email = ?", (email,))
+    conn.commit()
+    conn.close()
+
+    return RedirectResponse(url="http://safarnamaaa.ca")
+
+# ✅ Login (Restrict Unverified Users)
+@app.post("/users/login")
+def login(user: User):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    db_user = cursor.execute("SELECT * FROM users WHERE email = ?", (user.email,)).fetchone()
+    if not db_user:
+        conn.close()
+        raise HTTPException(status_code=400, detail="Invalid email or password")
+
+    if not db_user["verified"]:
+        conn.close()
+        raise HTTPException(status_code=403, detail="Please verify your email before logging in.")
+
+    if not verify_password(user.password, db_user["password"]):
+       conn.close()
+       raise HTTPException(status_code=400, detail="Invalid email or password")
+
+    conn.close()
+    return {"message": "Login successful", "email": user.email}
+
+# ✅ Get All Users
+@app.get("/users")
+def get_users():
+    conn = get_db_connection()
+    users = conn.execute("SELECT id, email, linkedin, files, verified FROM users").fetchall()
+    conn.close()
+    return {"users": [dict(user) for user in users]}
+
+# ✅ Get a User by Email
+@app.get("/users/{email}")
+def get_user(email: str):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    user = cursor.execute("SELECT id, email, linkedin, files, verified FROM users WHERE email = ?", (email,)).fetchone()
+    conn.close()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return dict(user)
+
+# ✅ Delete a User by Email
+@app.delete("/users/delete/{email}")
+def delete_user(email: str):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    existing_user = cursor.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
+    if not existing_user:
+        conn.close()
+        raise HTTPException(status_code=404, detail="User not found")
+
+    cursor.execute("DELETE FROM users WHERE email = ?", (email,))
+    conn.commit()
+    conn.close()
+    
+    return {"message": "User deleted successfully"}
+
+# ✅ Delete All Users & Reset ID Counter
+@app.delete("/users/clear")
+def clear_users():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute("DELETE FROM users;")
+    cursor.execute("DELETE FROM sqlite_sequence WHERE name='users';")
+    
+    conn.commit()
+    conn.close()
+    
+    return {"message": "All users deleted and ID counter reset"}
