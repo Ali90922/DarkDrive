@@ -21,7 +21,8 @@
 	}
 
 	h2 {
-		@apply text-xl text-center;
+
+		@apply text-2xl text-center;
 	}
 
 	nav {
