@@ -9,12 +9,14 @@ const Landing = () => {
 				style={{ backgroundImage: `url(${LandingImage})` }}
 				className='flex bg-cover bg-center h-[42rem] items-center'
 			>
-				<h4 className='text-black font-bold text-center text-[14rem] w-full'>DARK DRIVE</h4>
+				<h4 className='text-black font-bold text-center text-[14rem] w-full font-display'>
+					DARK DRIVE
+				</h4>
 			</span>
 			<section className='grid grid-cols-2 gap-8 py-8'>
 				<aside className='flex flex-col items-center justify-center p-8'>
 					<div className='flex flex-col gap-8 rounded-3xl p-8 py-12 backdrop-blur-sm'>
-						<h1>What is DarkDrive?</h1>
+						<h1 className='text-accent'>What is DarkDrive?</h1>
 						<p className='text-lg'>
 							DarkDrive is a decentralized file-sharing system that lets you upload and download
 							files securely across a peer-to-peer network. With no central servers, it’s resilient,
