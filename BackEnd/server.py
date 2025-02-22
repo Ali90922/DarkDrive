@@ -1,10 +1,11 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
-import shutil
-import os
+from fastapi.responses import StreamingResponse
 from cryptography.fernet import Fernet
+import os
+import shutil
 import uuid
+import io
 
 app = FastAPI()
 
@@ -26,15 +27,16 @@ async def upload_file(file: UploadFile = File(...)):
     2) Encrypt it using Fernet.
     3) Save only the encrypted version with .enc appended.
     4) Delete the original cleartext file.
-    5) Return JSON with "filename": "<original>.enc".
+    5) Return JSON with "filename": "<original>.enc" and the "encryption_key".
     """
+    # Build full path to a temporary location
     temp_file_location = os.path.join(UPLOAD_DIR, file.filename)
     
-    # Save the uploaded file
+    # Save the uploaded file (plaintext)
     with open(temp_file_location, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     
-    # Generate encryption key
+    # Generate encryption key (Fernet)
     encryption_key = Fernet.generate_key()
     fernet = Fernet(encryption_key)
     
@@ -42,26 +44,26 @@ async def upload_file(file: UploadFile = File(...)):
     with open(temp_file_location, "rb") as original_file:
         original_data = original_file.read()
 
-    # Encrypt
+    # Encrypt the file data
     encrypted_data = fernet.encrypt(original_data)
     
-    # Define the new filename with ".enc" appended
+    # Create the new filename with ".enc"
     encrypted_filename = file.filename + ".enc"
     encrypted_file_location = os.path.join(UPLOAD_DIR, encrypted_filename)
 
-    # Save the encrypted file
+    # Write the encrypted file to disk
     with open(encrypted_file_location, "wb") as encrypted_file:
         encrypted_file.write(encrypted_data)
     
-    # Remove the original (unencrypted) file
+    # Remove the original plaintext file
     os.remove(temp_file_location)
     
-    # Prepare a JSON response
+    # Return JSON response
     response = {
         "filename": encrypted_filename,
         "status": "File uploaded and encrypted successfully",
-        "encryption_key": encryption_key.decode(),  # If you need the key for later usage
-        "token": str(uuid.uuid4()),
+        "encryption_key": encryption_key.decode(),  # Return key if you need it for decryption
+        "token": str(uuid.uuid4()),  # Example additional data
     }
     print("Response:", response)
     return response
@@ -71,43 +73,66 @@ async def get_user_files(email: str):
     """
     Return a list of ALL .enc files in UPLOAD_DIR.
     (No real filtering by user here—just a demo.)
-    The frontend uses this to display a list of files.
+    The frontend uses this to display a list of encrypted files.
     """
     all_files = os.listdir(UPLOAD_DIR)
-    # In this example, let's only return files ending in ".enc"
+    # Only return files ending in ".enc"
     enc_files = [f for f in all_files if f.endswith(".enc")]
     
-    # If you wanted to filter by user, you'd need a naming convention or DB link here.
-    
+    # In a real scenario, you'd filter files by user or DB logic
     return {"files": enc_files}
 
-@app.get("/download/{filename:path}")
-async def download_file(filename: str):
+@app.get("/download")
+async def download_file(filename: str, key: str):
+    print(filename,key)
     """
-    Download EXACTLY the file name requested, e.g. "JD-Q2.asm.enc".
-    We do NOT append ".enc" here. If the file on disk is "JD-Q2.asm.enc",
-    you must request /download/JD-Q2.asm.enc
+    Decrypt the .enc file from the server using the provided key
+    and return the decrypted file to the user as a download.
+
+    Example usage:
+      GET /download/myfile.txt.enc?key=BASE64_FERNET_KEY
     """
     file_path = os.path.join(UPLOAD_DIR, filename)
-    
-    # Debugging: Log when the download endpoint is hit.
-    print(f"[DEBUG] Download endpoint called for filename: {filename}")
-    print(f"[DEBUG] Full file path computed: {file_path}")
-    
+	
     if not os.path.exists(file_path):
-        print(f"[DEBUG] File not found: {file_path}")
+	
         raise HTTPException(status_code=404, detail="File not found")
-    
-    print(f"[DEBUG] File found. Preparing to send file: {file_path}")
-    
-    return FileResponse(
-        path=file_path,
+
+    # Read the encrypted bytes
+    with open(file_path, "rb") as encrypted_file:
+        encrypted_data = encrypted_file.read()
+
+    # Initialize Fernet with the provided key
+    try:
+        fernet = Fernet(key)
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid Fernet key: {str(e)}"
+        )
+
+    # Decrypt the data
+    try:
+        decrypted_data = fernet.decrypt(encrypted_data)
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Decryption failed: {str(e)}"
+        )
+
+    # Optionally remove ".enc" from filename for the downloaded file
+    original_filename = filename.removesuffix(".enc")  # requires Python 3.9+
+
+    # Use StreamingResponse to send decrypted bytes
+    file_like = io.BytesIO(decrypted_data)
+    response = StreamingResponse(
+        file_like,
         media_type="application/octet-stream",
-        filename=filename
     )
-
-
-
+    response.headers["Content-Disposition"] = (
+        f'attachment; filename="{original_filename}"'
+    )
+    return response
 
 if __name__ == "__main__":
     import uvicorn
