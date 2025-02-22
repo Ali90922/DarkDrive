@@ -6,9 +6,9 @@ const Home = () => {
   const [files, setFiles] = useState([]);
 
   // Base URL for file listing and upload (from server.py)
-  const API_URL = "http://18.220.232.235:8000";
+  const API_URL = "http://98.83.145.159:8000";
   // Separate base URL for downloads (from download_api.py)
-  const DOWNLOAD_API_URL = "http://18.220.232.235:8001";
+  const DOWNLOAD_API_URL = "http://98.83.145.159:8001";
 
   useEffect(() => {
     const getUserData = async () => {
