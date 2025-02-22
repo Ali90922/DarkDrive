@@ -208,7 +208,7 @@ const AdminDashboard = () => {
 
 	// Stat Card Component
 	const StatCard = ({ title, value, unit = "" }) => (
-		<div className='bg-gray-800 p-6 rounded-xl shadow-lg'>
+		<div className='bg-primary p-6 rounded-xl shadow-lg'>
 			<h3 className='text-gray-400 text-sm font-medium mb-2'>{title}</h3>
 			<div className='flex items-baseline'>
 				<span className='text-2xl font-bold text-white'>{value.toFixed(1)}</span>
@@ -219,7 +219,7 @@ const AdminDashboard = () => {
 
 	// Machine Card Component
 	const MachineCard = ({ machine }) => (
-		<div className='bg-gray-800 p-6 rounded-xl shadow-lg'>
+		<div className='bg-primary p-6 rounded-xl shadow-lg'>
 			<h3 className='text-lg font-semibold text-white mb-4'>{machine.hostname}</h3>
 			<div className='space-y-3'>
 				<div className='flex justify-between items-center'>
@@ -248,7 +248,7 @@ const AdminDashboard = () => {
 	}
 
 	return (
-		<div className='min-h-screen bg-gray-900 p-6'>
+		<div className='min-h-screen p-6'>
 			<div className='max-w-7xl mx-auto'>
 				<div className='flex justify-between items-center mb-8'>
 					<div>
@@ -266,10 +266,10 @@ const AdminDashboard = () => {
 
 				{/* Charts */}
 				<div className='grid grid-cols-1 md:grid-cols-2 gap-6 mb-8'>
-					<div className='bg-gray-800 p-6 rounded-xl shadow-lg'>
+					<div className='bg-primary p-6 rounded-xl shadow-lg'>
 						<Line data={cpuChartData} options={cpuChartOptions} />
 					</div>
-					<div className='bg-gray-800 p-6 rounded-xl shadow-lg'>
+					<div className='bg-primary p-6 rounded-xl shadow-lg'>
 						<Doughnut data={diskChartData} options={diskChartOptions} />
 					</div>
 				</div>

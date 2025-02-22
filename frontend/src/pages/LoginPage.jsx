@@ -14,7 +14,7 @@ const LoginPage = () => {
 			{signUp ? (
 				<>
 					<SignUpPage />
-					<span className='flex gap-1'>
+					<span className='flex gap-1 pt-6'>
 						<p>Already Registered?</p>
 						<button
 							onClick={() => toggleSignUp()}
@@ -27,7 +27,7 @@ const LoginPage = () => {
 			) : (
 				<>
 					<Login />
-					<span className='flex gap-1'>
+					<span className='flex gap-1 pt-6'>
 						<p>New User?</p>
 						<button
 							onClick={() => toggleSignUp()}

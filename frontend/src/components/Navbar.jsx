@@ -5,7 +5,6 @@ const Navbar = () => {
 	const navLinks = [
 		{ name: "Home", path: "/" },
 		{ name: "Login", path: "/login" },
-		{ name: "Admin", path: "/admin" },
 	];
 
 	return (
@@ -13,7 +12,13 @@ const Navbar = () => {
 			<h1>DarkDrive</h1>
 			<ul>
 				{navLinks.map((link) => (
-					<Link key={link.name} to={link.path} className='navLink'>
+					<Link
+						key={link.name}
+						to={link.path}
+						className={`navLink ${
+							link.name === "Login" && "h-4 px-4 bg-accent text-primary hover:bg-highlight"
+						}`}
+					>
 						{link.name}
 					</Link>
 				))}
