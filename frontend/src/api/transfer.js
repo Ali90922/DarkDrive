@@ -24,7 +24,8 @@ export const uploadFiles = async (files) => {
 				},
 			});
 
-			alert(`Token: ${response.data.token}\nEncryption Key: ${response.data.encryption_key}`);
+			alert(`Encryption Key: ${response.data.encryption_key}`);
+			sessionStorage.setItem("encKey", response.data.encryption_key);
 			console.log(response);
 
 			if (response.status !== 200) {
