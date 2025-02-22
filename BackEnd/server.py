@@ -52,13 +52,19 @@ async def upload_file(file: UploadFile = File(...)):
     # Generate a unique success token
     success_token = str(uuid.uuid4())
     
-    # Return the encryption key (decoded to string) and token to the user
-    return {
+    # Create the response dictionary
+    response = {
         "filename": file.filename,
         "status": "File uploaded and encrypted successfully",
         "encryption_key": encryption_key.decode(),
         "token": success_token
     }
+    
+    # Print the response to the console
+    print("Response:", response)
+    
+    # Return the JSON response to the user
+    return response
 
 if __name__ == "__main__":
     import uvicorn

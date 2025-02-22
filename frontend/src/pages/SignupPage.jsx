@@ -125,6 +125,23 @@ const SignUpPage = () => {
 				<input placeholder='••••••••••' type='password' />
 			</span>
 		</div>
+		// <div>
+		// 	<img src='https://placehold.co/200x100' />
+		// 	<h2>Welcome to DarkDrive</h2>
+		// 	<hr />
+		// 	<span>
+		// 		<label>Email</label>
+		// 		<input placeholder='example@email.com' type='email' />
+		// 	</span>
+		// 	<span>
+		// 		<label>Password</label>
+		// 		<input placeholder='••••••••••' type='password' />
+		// 	</span>
+		// 	<span>
+		// 		<label>Confirm Password</label>
+		// 		<input placeholder='••••••••••' type='password' />
+		// 	</span>
+		// </div>
 	);
 };
 
