@@ -35,6 +35,10 @@ const SignUpPage = () => {
 				setError(result.error);
 			}
 			setShowModal(true);
+
+			setTimeout(() => {
+				setShowModal(false);
+			}, 10000);
 		} catch (err) {
 			setError("An error occurred during signup");
 		} finally {
@@ -44,9 +48,10 @@ const SignUpPage = () => {
 
 	return (
 		<>
-			{showModal && <VerificationModal />}
 			<form
-				className='flex flex-col gap-8 bg-primary/40 backdrop-blur-sm p-8 rounded-xl w-1/4 border-[1px] border-white/40'
+				className={`flex flex-col gap-8 bg-primary/40 backdrop-blur-sm p-8 rounded-xl w-1/4 border-[1px] border-white/40 ${
+					showModal && "blur-2xl"
+				}`}
 				onSubmit={handleSubmit}
 			>
 				<h2 className='font-bold'>Register</h2>
@@ -89,6 +94,7 @@ const SignUpPage = () => {
 					{loading ? "Signing up..." : "Sign Up"}
 				</button>
 			</form>
+			{showModal && <VerificationModal />}
 		</>
 	);
 };

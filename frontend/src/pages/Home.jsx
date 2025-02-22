@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import LandingImage from "/LandingImage.jpg";
 import Card from "../components/Card";
 
-const Landing = () => {
+const Home = () => {
 	return (
 		<>
 			<span
@@ -56,4 +56,4 @@ const Landing = () => {
 	);
 };
 
-export default Landing;
+export default Home;

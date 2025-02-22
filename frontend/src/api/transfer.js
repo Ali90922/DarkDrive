@@ -24,7 +24,7 @@ export const uploadFiles = async (files) => {
 				},
 			});
 
-			localStorage.setItem("encryptionKey", response.data.encryption_key);
+			sessionStorage.setItem("encryptionKey", response.data.encryption_key);
 			console.log(response);
 
 			if (response.status !== 200) {
