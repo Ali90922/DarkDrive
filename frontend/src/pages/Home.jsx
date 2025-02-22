@@ -37,7 +37,11 @@ const Home = () => {
 								className='flex justify-between p-2 border-b border-gray-600 last:border-b-0 hover:bg-gray-700 transition'
 							>
 								<p>{file}</p>
-								<a download={file} className='text-blue-400 cursor-pointer'>
+								<a 
+									href={`${API_URL}/download/${file}`} 
+									download={file} 
+									className='text-blue-400 cursor-pointer'
+								>
 									Download
 								</a>
 							</li>
