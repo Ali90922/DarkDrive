@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import psutil
 import socket
 import platform
@@ -6,6 +7,20 @@ import uptime
 import uvicorn
 
 app = FastAPI()
+
+# Configure allowed origins (you can use "*" to allow all, but it's safer to list specific origins)
+origins = [
+    "http://localhost:5174",
+    # add other origins as needed
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,       # or use ["*"] to allow all origins
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def get_system_metrics():
     return {
@@ -48,6 +63,4 @@ async def metrics():
     return get_system_metrics()
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8080)    
-o
-
+    uvicorn.run(app, host="0.0.0.0", port=8080)
