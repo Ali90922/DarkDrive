@@ -15,8 +15,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Directory to store uploaded files
-UPLOAD_DIR = "/home/ec2-user/uploads"
+# New directory in the root (`/`) to store uploaded files
+UPLOAD_DIR = "/file_uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)  # Ensure directory exists
 
 @app.post("/upload/")
@@ -26,9 +26,8 @@ async def upload_file(file: UploadFile = File(...)):
     with open(file_location, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    return {"filename": file.filename, "status": "File uploaded successfully"}
+    return {"filename": file.filename, "status": "File uploaded successfully", "saved_path": file_location}
 
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
-
