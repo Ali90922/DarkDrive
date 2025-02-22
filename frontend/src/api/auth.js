@@ -1,7 +1,7 @@
 // auth.js
 import axios from "axios";
 
-const API_URL = "http://18.220.232.235:8000"; // Adjust this to your backend URL
+const API_URL = import.meta.env.VITE_AUTH_API_URL;
 
 export const logout = () => {
 	localStorage.removeItem("userToken");
@@ -15,7 +15,6 @@ export const isAuthenticated = () => {
 	return !!localStorage.getItem("userToken");
 };
 
-// Add an axios interceptor to include the token in all requests
 axios.interceptors.request.use(
 	(config) => {
 		const token = getToken();
