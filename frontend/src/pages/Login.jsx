@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { loginUser } from "../api/auth";
 import { useNavigate } from "react-router-dom";
 
@@ -20,12 +20,11 @@ const LoginPage = () => {
 		try {
 			const result = await loginUser(formData);
 
-			if (result.message == "Login successful") {
-				// If we got a token, login was successful
+			if (result.message === "Login successful") {
 				const email = result.email;
 				console.log(result);
 				localStorage.setItem("email", email);
-				navigate("/");
+				navigate("/user");
 			} else {
 				setError("Login failed - no token received");
 			}
@@ -38,43 +37,39 @@ const LoginPage = () => {
 	};
 
 	return (
-		<div className='flex flex-col items-center pt-8 min-h-screen bg-gray-900 text-white'>
-			<h1 className='text-3xl font-bold mb-4'>Welcome to DarkDrive</h1>
-			<p className='text-gray-400 mb-6'>
-				Login and upload your files, safe and secure, completely free!
-			</p>
-			<form className='bg-gray-800 p-6 rounded-lg shadow-lg w-80' onSubmit={handleSubmit}>
-				<label className='block text-sm font-medium mb-1'>Email</label>
+		<form
+			className='flex flex-col gap-8 bg-primary/40 backdrop-blur-sm p-8 rounded-xl w-1/4'
+			onSubmit={handleSubmit}
+		>
+			<h2 className='font-bold'>Login</h2>
+			<hr />
+			<span className='flex flex-col gap-2'>
+				<label>Email</label>
 				<input
-					className='w-full p-2 mb-4 border border-gray-600 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500'
+					placeholder='example@email.com'
 					type='email'
 					name='email'
 					value={formData.email}
 					onChange={handleChange}
 					required
 				/>
-
-				<label className='block text-sm font-medium mb-1'>Password</label>
+			</span>
+			<span className='flex flex-col gap-2'>
+				<label>Password</label>
 				<input
-					className='w-full p-2 mb-4 border border-gray-600 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500'
+					placeholder='••••••••••'
 					type='password'
 					name='password'
 					value={formData.password}
 					onChange={handleChange}
 					required
 				/>
-
-				{error && <p className='text-red-500 text-sm mb-2'>{error}</p>}
-
-				<button
-					className='w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition disabled:opacity-50'
-					type='submit'
-					disabled={loading}
-				>
-					{loading ? "Logging in..." : "Login"}
-				</button>
-			</form>
-		</div>
+			</span>
+			{error && <p className='text-red-500 text-sm'>{error}</p>}
+			<button type='submit' disabled={loading}>
+				{loading ? "Logging in..." : "Login"}
+			</button>
+		</form>
 	);
 };
 
