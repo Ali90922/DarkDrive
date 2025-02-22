@@ -1,0 +1,16 @@
+nohup: ignoring input
+INFO:     Started server process [2226779]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0INFO:     140.193.83.115:55991 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     140.193.83.115:55991 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     140.193.83.115:56003 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     140.193.83.115:56003 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     140.193.83.115:56049 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     140.193.83.115:56049 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     140.193.83.115:56192 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     140.193.83.115:56192 - "GET /metrics HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [2226778]
