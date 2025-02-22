@@ -90,14 +90,24 @@ async def download_file(filename: str):
     """
     file_path = os.path.join(UPLOAD_DIR, filename)
     
+    # Debugging: Log when the download endpoint is hit.
+    print(f"[DEBUG] Download endpoint called for filename: {filename}")
+    print(f"[DEBUG] Full file path computed: {file_path}")
+    
     if not os.path.exists(file_path):
+        print(f"[DEBUG] File not found: {file_path}")
         raise HTTPException(status_code=404, detail="File not found")
+    
+    print(f"[DEBUG] File found. Preparing to send file: {file_path}")
     
     return FileResponse(
         path=file_path,
         media_type="application/octet-stream",
         filename=filename
     )
+
+
+
 
 if __name__ == "__main__":
     import uvicorn
