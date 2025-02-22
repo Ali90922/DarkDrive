@@ -1,7 +1,9 @@
 const Footer = () => {
 	return (
 		<footer>
-			<p>&copy; {new Date().getFullYear()} DarkDrive. All rights reserved.</p>
+			<p className='text-accent'>
+				&copy; {new Date().getFullYear()} DarkDrive. All rights reserved.
+			</p>
 		</footer>
 	);
 };

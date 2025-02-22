@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 @theme {
-	--color-primary: black;
-	--color-background: #0a0a0a;
-	--color-secondary: gray;
-	--color-tertiary: lightgray;
-	--color-accent: darkblue;
-	--color-highlight: blue;
+	--color-primary: #0a0a0a; /* Used for header backgrounds/elements */
+	--color-background: #0f0f0f; /* Overall background */
+	--color-secondary: #ffd700; /* Accent elements (gold) */
+	--color-tertiary: #dfdfdf; /* Text color (gold) */
+	--color-accent: #ffd700; /* Additional accents (gold) */
+	--color-highlight: #ffc700; /* Highlights (gold) */
 }
 
 @layer base {
@@ -17,7 +17,7 @@
 
 @layer components {
 	h1 {
-		@apply text-3xl font-bold;
+		@apply text-3xl font-bold text-accent;
 	}
 
 	h2 {
@@ -36,20 +36,24 @@
 		@apply rounded-lg;
 	}
 
+	hr {
+		@apply border-white/40;
+	}
+
 	input {
-		@apply border-2 rounded-lg p-2;
+		@apply border-2 rounded-lg p-2 border-white/40;
 	}
 
 	.navLink {
-		@apply border-b-4 border-transparent py-8 text-lg transition-colors duration-200;
+		@apply border-b-4 border-transparent py-8 text-lg text-accent transition-colors duration-200;
 	}
 
 	.navLink:hover {
-		@apply text-white;
+		@apply text-highlight;
 	}
 
 	button {
-		@apply py-4 px-8 bg-accent rounded-lg transition-colors duration-200 cursor-pointer;
+		@apply py-3 px-8 bg-accent text-primary rounded-lg transition-colors duration-200 cursor-pointer;
 	}
 
 	button:hover {

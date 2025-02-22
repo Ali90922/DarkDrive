@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { signupUser } from "../api/auth";
-import VerificationModal from "../components/VerificationModal";
+import VerificationModal from "./VerificationModal";
 
 const SignUpPage = () => {
 	const [showModal, setShowModal] = useState(false);
@@ -46,7 +46,7 @@ const SignUpPage = () => {
 		<>
 			{showModal && <VerificationModal />}
 			<form
-				className='flex flex-col gap-8 bg-primary/40 backdrop-blur-sm p-8 rounded-xl w-1/4'
+				className='flex flex-col gap-8 bg-primary/40 backdrop-blur-sm p-8 rounded-xl w-1/4 border-[1px] border-white/40'
 				onSubmit={handleSubmit}
 			>
 				<h2 className='font-bold'>Register</h2>
