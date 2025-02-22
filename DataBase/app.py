@@ -7,16 +7,15 @@ from email.message import EmailMessage
 from pydantic import BaseModel
 from fastapi.responses import RedirectResponse
 
-
 app = FastAPI()
 
 # Enable CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins (Change this in production)
+    allow_origins=["*"],  # Allow all origins (change in production)
     allow_credentials=True,
-    allow_methods=["*"],  # Allow all HTTP methods
-    allow_headers=["*"],  # Allow all headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Database Connection
@@ -97,7 +96,7 @@ def verify_email(email: str):
 
     return RedirectResponse(url="http://safarnamaaa.ca")
 
-# ✅ Login (Restrict Unverified Users)
+# login
 @app.post("/users/login")
 def login(user: User):
     conn = get_db_connection()
@@ -171,13 +170,20 @@ def clear_users():
     return {"message": "All users deleted and ID counter reset"}
 
 
-@app.post("/users/upload/{id}")
+# ✅ Upload File for a Specific User
+@app.post("/users/upload/{email}")
 def upload_file(email: str, file: UploadFile = File(...)):
+    """
+    Expects a multipart/form-data with a key 'file'.
+    Example: 
+      POST /users/upload/test%40example.com
+      form-data => { file: <the actual file> }
+    """
     conn = get_db_connection()
     cursor = conn.cursor()
 
     # Check if the user exists
-    user = cursor.execute("SELECT * FROM users WHERE id = ?", (email,)).fetchone()
+    user = cursor.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
     if not user:
         conn.close()
         raise HTTPException(status_code=404, detail="User not found")
@@ -186,8 +192,33 @@ def upload_file(email: str, file: UploadFile = File(...)):
     existing_files = user["files"]
     new_files = file.filename if existing_files is None else f"{existing_files},{file.filename}"
 
-    cursor.execute("UPDATE users SET files = ? WHERE id = ?", (new_files, email))
+    cursor.execute("UPDATE users SET files = ? WHERE email = ?", (new_files, email))
     conn.commit()
     conn.close()
 
     return {"message": "Filename stored successfully", "filename": file.filename}
+
+@app.get("/users/files/{email}")
+def get_user_files(email: str):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Check if user exists
+    user = cursor.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
+    if not user:
+        conn.close()
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Retrieve the comma-separated filenames (if any)
+    files_csv = user["files"]
+    
+    # Convert CSV string -> list; if it's None or empty, use an empty list
+    if files_csv:
+        files_list = files_csv.split(",")
+    else:
+        files_list = []
+    
+    conn.close()
+    
+    # Return a JSON object, e.g. { "files": ["file1.pdf", "file2.png"] }
+    return {"files": files_list}
