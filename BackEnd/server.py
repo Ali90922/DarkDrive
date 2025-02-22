@@ -1,7 +1,8 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 import shutil
 import os
-from fastapi.middleware.cors import CORSMiddleware
 from cryptography.fernet import Fernet
 import uuid
 
@@ -41,7 +42,7 @@ async def upload_file(file: UploadFile = File(...)):
     # Encrypt the file data
     encrypted_data = fernet.encrypt(original_data)
     
-    # Define encrypted file location (you could also overwrite the original file if desired)
+    # Define encrypted file location (with .enc extension)
     encrypted_file_location = os.path.join(UPLOAD_DIR, f"{file.filename}.enc")
     with open(encrypted_file_location, "wb") as encrypted_file:
         encrypted_file.write(encrypted_data)
@@ -65,6 +66,24 @@ async def upload_file(file: UploadFile = File(...)):
     
     # Return the JSON response to the user
     return response
+
+@app.get("/download/{filename}")
+async def download_file(filename: str):
+    """
+    Download the encrypted file from the server.
+    Expects the filename (without .enc extension) as a path parameter.
+    """
+    file_path = os.path.join(UPLOAD_DIR, f"{filename}.enc")
+    
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    # Return the file for download.
+    return FileResponse(
+        path=file_path,
+        media_type="application/octet-stream",
+        filename=f"{filename}.enc"
+    )
 
 if __name__ == "__main__":
     import uvicorn
