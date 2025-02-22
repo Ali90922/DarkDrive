@@ -27,8 +27,8 @@ ChartJS.register(
 
 const AdminDashboard = () => {
 	const JUVENTUS_URL = import.meta.env.VITE_JUVENTUS;
-	const HASHIR_URL = import.meta.env.VITE_HASHIR;
 	const MILAN_URL = import.meta.env.VITE_MILAN;
+	const HASHIR_URL = import.meta.env.VITE_HASHIR;
 	const RAYAN_URL = import.meta.env.VITE_RAYAN;
 
 	// State for metrics and averages
@@ -38,69 +38,101 @@ const AdminDashboard = () => {
 		memory_usage: 0,
 		disk_usage: 0,
 	});
+	const [loading, setLoading] = useState(true);
 
 	// Function to fetch machine metrics
 	const getMachineMetrics = async () => {
 		const machines = [
 			{ id: 1, name: "Ali - 1 (Juventus)", url: JUVENTUS_URL },
-			// { id: 2, name: "Hashir - 1", url: HASHIR_URL },
-			// { id: 3, name: "Ali Nawaz - 2 (Milan)", url: MILAN_URL },
-			// {
-			// 	id: 4,
-			// 	name: "Rayan Kashif - 1 (DataBase Store)",
-			// 	url: RAYAN_URL,
-			// },
+			{ id: 2, name: "Ali Nawaz - 2 (Milan)", url: MILAN_URL },
+			// { id: 3, name: "Hashir - 1", url: HASHIR_URL },
+			{ id: 4, name: "Rayan Kashif - 1 (DataBase Store)", url: RAYAN_URL },
 		];
 
 		try {
-			// Fetch data for each machine
 			const responses = await Promise.all(
 				machines.map(async (machine) => {
-					const res = await fetch(machine.url);
+					try {
+						const res = await fetch(machine.url);
+						if (!res.ok) {
+							throw new Error(`Failed to fetch data for ${machine.name}`);
+						}
+						const data = await res.json();
 
-					if (!res.ok) {
-						throw new Error(`Failed to fetch data for ${machine.name}`);
+						return {
+							machine: machine.name,
+							hostname: machine.name, // For MachineCard component
+							metrics: {
+								cpu_usage_percent: parseFloat(data.cpu.cpu_usage_percent || 0),
+								memory_usage_percent: parseFloat(data.memory.memory_usage_percent || 0),
+								disk_usage_percent: parseFloat(data.disk.disk_usage_percent || 0),
+							},
+						};
+					} catch (error) {
+						console.error(`Error fetching data for ${machine.name}:`, error);
+						// Return null so we can filter out offline machines
+						return null;
 					}
-					const data = await res.json();
-					return { machine: machine.name, metrics: data };
 				})
 			);
 
-			// Return the combined results
-			return responses;
+			// Filter out any machines that failed to load
+			return responses.filter((response) => response !== null);
 		} catch (error) {
 			console.error("Error fetching machine metrics:", error);
-			return null;
+			return [];
 		}
 	};
 
-	// Fetch data when component mounts
 	useEffect(() => {
 		const fetchData = async () => {
+			setLoading(true);
 			const fetchedMetrics = await getMachineMetrics();
-			if (fetchedMetrics) {
+
+			if (fetchedMetrics && fetchedMetrics.length > 0) {
 				setMetrics(fetchedMetrics);
 
-				// Calculate averages
+				// Calculate averages based on only the online machines
 				const cpuUsage =
-					fetchedMetrics.reduce((acc, machine) => acc + machine.metrics.cpu_usage_percent, 0) /
-					fetchedMetrics.length;
+					fetchedMetrics.reduce(
+						(acc, machine) => acc + (machine.metrics.cpu_usage_percent || 0),
+						0
+					) / fetchedMetrics.length;
+
 				const memoryUsage =
-					fetchedMetrics.reduce((acc, machine) => acc + machine.metrics.memory_usage_percent, 0) /
-					fetchedMetrics.length;
+					fetchedMetrics.reduce(
+						(acc, machine) => acc + (machine.metrics.memory_usage_percent || 0),
+						0
+					) / fetchedMetrics.length;
+
 				const diskUsage =
-					fetchedMetrics.reduce((acc, machine) => acc + machine.metrics.disk_usage_percent, 0) /
-					fetchedMetrics.length;
+					fetchedMetrics.reduce(
+						(acc, machine) => acc + (machine.metrics.disk_usage_percent || 0),
+						0
+					) / fetchedMetrics.length;
 
 				setAverages({
 					cpu_usage: cpuUsage,
 					memory_usage: memoryUsage,
 					disk_usage: diskUsage,
 				});
+			} else {
+				// Optionally handle the case where no machines responded
+				setMetrics([]);
+				setAverages({
+					cpu_usage: 0,
+					memory_usage: 0,
+					disk_usage: 0,
+				});
 			}
+			setLoading(false);
 		};
 
 		fetchData();
+
+		// Set up polling every 30 seconds
+		const interval = setInterval(fetchData, 5000);
+		return () => clearInterval(interval);
 	}, []);
 
 	// CPU Chart Data
@@ -110,10 +142,10 @@ const AdminDashboard = () => {
 			{
 				label: "CPU Usage (%)",
 				data: metrics.map((machine) => machine.metrics.cpu_usage_percent),
-				fill: false,
-				backgroundColor: "rgb(255, 99, 132)",
-				borderColor: "rgba(255, 99, 132, 0.2)",
-				tension: 0.1,
+				fill: true,
+				backgroundColor: "rgba(255, 99, 132, 0.2)",
+				borderColor: "rgb(255, 99, 132)",
+				tension: 0.4,
 			},
 		],
 	};
@@ -123,13 +155,7 @@ const AdminDashboard = () => {
 		labels: ["Used", "Free"],
 		datasets: [
 			{
-				data: [
-					metrics.reduce((acc, machine) => acc + machine.metrics.disk_usage_percent, 0) /
-						metrics.length,
-					100 -
-						metrics.reduce((acc, machine) => acc + machine.metrics.disk_usage_percent, 0) /
-							metrics.length,
-				],
+				data: [averages.disk_usage, 100 - averages.disk_usage],
 				backgroundColor: ["#ff6347", "#28a745"],
 				borderColor: ["#ff6347", "#28a745"],
 				borderWidth: 1,
@@ -140,6 +166,7 @@ const AdminDashboard = () => {
 	// Chart Options for CPU
 	const cpuChartOptions = {
 		responsive: true,
+		maintainAspectRatio: false,
 		plugins: {
 			legend: {
 				position: "top",
@@ -163,6 +190,7 @@ const AdminDashboard = () => {
 		scales: {
 			y: {
 				beginAtZero: true,
+				max: 30,
 				grid: {
 					color: "rgba(255, 255, 255, 0.1)",
 				},
@@ -184,6 +212,7 @@ const AdminDashboard = () => {
 	// Chart Options for Disk Usage
 	const diskChartOptions = {
 		responsive: true,
+		maintainAspectRatio: false,
 		plugins: {
 			legend: {
 				position: "top",
@@ -196,7 +225,7 @@ const AdminDashboard = () => {
 			},
 			title: {
 				display: true,
-				text: "Total Disk Usage (GB)",
+				text: "Total Disk Usage (%)",
 				color: "white",
 				font: {
 					size: 16,
@@ -224,28 +253,27 @@ const AdminDashboard = () => {
 			<div className='space-y-3'>
 				<div className='flex justify-between items-center'>
 					<span className='text-gray-400'>CPU</span>
-					<span className='text-white'>{machine.metrics.cpu_usage_percent}%</span>
+					<span className='text-white'>{machine.metrics.cpu_usage_percent.toFixed(1)}%</span>
 				</div>
 				<div className='flex justify-between items-center'>
 					<span className='text-gray-400'>Memory</span>
-					<span className='text-white'>{machine.metrics.memory_usage_percent}%</span>
+					<span className='text-white'>{machine.metrics.memory_usage_percent.toFixed(1)}%</span>
 				</div>
 				<div className='flex justify-between items-center'>
 					<span className='text-gray-400'>Disk</span>
-					<span className='text-white'>{machine.metrics.disk_usage_percent}%</span>
+					<span className='text-white'>{machine.metrics.disk_usage_percent.toFixed(1)}%</span>
 				</div>
 			</div>
 		</div>
 	);
 
-	// Loading state
-	if (!metrics || !averages) {
-		return (
-			<div className='flex items-center justify-center min-h-screen bg-gray-900'>
-				<div className='text-white text-xl'>Loading metrics...</div>
-			</div>
-		);
-	}
+	// if (loading) {
+	// 	return (
+	// 		<div className='flex items-center justify-center min-h-screen'>
+	// 			<div className='text-white text-xl'>Loading metrics...</div>
+	// 		</div>
+	// 	);
+	// }
 
 	return (
 		<div className='min-h-screen p-6'>
@@ -266,10 +294,10 @@ const AdminDashboard = () => {
 
 				{/* Charts */}
 				<div className='grid grid-cols-1 md:grid-cols-2 gap-6 mb-8'>
-					<div className='bg-primary p-6 rounded-xl shadow-lg'>
+					<div className='bg-primary p-6 rounded-xl shadow-lg' style={{ height: "400px" }}>
 						<Line data={cpuChartData} options={cpuChartOptions} />
 					</div>
-					<div className='bg-primary p-6 rounded-xl shadow-lg'>
+					<div className='bg-primary p-6 rounded-xl shadow-lg' style={{ height: "400px" }}>
 						<Doughnut data={diskChartData} options={diskChartOptions} />
 					</div>
 				</div>
@@ -278,8 +306,8 @@ const AdminDashboard = () => {
 				<div>
 					<h2 className='text-xl font-semibold text-white mb-6'>Individual Machine Stats</h2>
 					<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
-						{metrics.map((machine) => (
-							<MachineCard key={machine.id} machine={machine} />
+						{metrics.map((machine, index) => (
+							<MachineCard key={index} machine={machine} />
 						))}
 					</div>
 				</div>
