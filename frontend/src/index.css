@@ -16,7 +16,23 @@
 }
 
 @layer components {
+	h1 {
+		@apply text-2xl font-bold;
+	}
+
 	nav {
-		@apply bg-primary flex justify-between p-8;
+		@apply bg-primary flex justify-between items-center px-16;
+	}
+
+	nav ul {
+		@apply flex gap-8;
+	}
+
+	.navLink {
+		@apply border-b-4 border-transparent py-8 text-lg transition-colors duration-200;
+	}
+
+	.navLink:hover {
+		@apply text-white;
 	}
 }

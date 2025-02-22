@@ -4,9 +4,9 @@ import { Link } from "react-router-dom";
 const Navbar = () => {
 	const navLinks = [
 		{ name: "Home", path: "/" },
-		{ name: "Sign Up", path: "/" },
-		{ name: "Login", path: "/" },
-		{ name: "Dashboard", path: "/" },
+		{ name: "Sign Up", path: "/sign-up" },
+		{ name: "Login", path: "/login" },
+		{ name: "Dashboard", path: "/dashboard" },
 	];
 
 	return (
@@ -14,7 +14,7 @@ const Navbar = () => {
 			<h1>DarkDrive</h1>
 			<ul>
 				{navLinks.map((link) => (
-					<Link key={link.name} to={link.path}>
+					<Link key={link.name} to={link.path} className='navLink'>
 						{link.name}
 					</Link>
 				))}
