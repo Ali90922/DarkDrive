@@ -8,18 +8,15 @@ import uvicorn
 
 app = FastAPI()
 
-# Configure allowed origins (you can use "*" to allow all, but it's safer to list specific origins)
-origins = [
-    "http://localhost:5174",
-    # add other origins as needed
-]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,       # or use ["*"] to allow all origins
+    allow_origins=["*"],  # Use ["*"] not [*]
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
+    expose_headers=["*"],
+    max_age=600,
 )
 
 def get_system_metrics():
