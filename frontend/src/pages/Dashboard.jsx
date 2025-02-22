@@ -5,8 +5,10 @@ import axios from "axios";
 const Home = () => {
   const [files, setFiles] = useState([]);
 
-  // Use the same base URL as defined in your server.py
+  // Base URL for file listing and upload (from server.py)
   const API_URL = "http://18.220.232.235:8000";
+  // Separate base URL for downloads (from download_api.py)
+  const DOWNLOAD_API_URL = "http://18.220.232.235:8001";
 
   useEffect(() => {
     const getUserData = async () => {
@@ -23,12 +25,13 @@ const Home = () => {
     getUserData();
   }, []);
 
-  // Function to download file using axios
+  // Function to download file using axios from the separate download API
   const handleDownload = async (file) => {
     try {
-      const response = await axios.get(`${API_URL}/download/${encodeURIComponent(file)}`, {
-        responseType: "blob", // important for handling binary data
-      });
+      const response = await axios.get(
+        `${DOWNLOAD_API_URL}/download/${encodeURIComponent(file)}`,
+        { responseType: "blob" } // important for handling binary data
+      );
       // Create a URL from the blob
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
