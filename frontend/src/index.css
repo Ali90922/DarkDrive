@@ -65,4 +65,13 @@
 	footer {
 		@apply bg-primary p-8 w-full;
 	}
+
+	.custom-scrollbar::-webkit-scrollbar {
+		display: none; /* Doesn't work */
+	}
+
+	.custom-scrollbar {
+		scrollbar-width: none; /* Firefox */
+		-ms-overflow-style: none; /* IE & Edge */
+	}
 }
