@@ -1,19 +1,16 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { uploadFiles } from "../api/transfer.js";
 
 const FileUpload = () => {
 	const [dragActive, setDragActive] = useState(false);
 	const [files, setFiles] = useState([]);
 	const [uploadStatus, setUploadStatus] = useState("");
+	const [serverResponse, setServerResponse] = useState(null);
 
 	const handleDrag = (e) => {
 		e.preventDefault();
 		e.stopPropagation();
-		if (e.type === "dragenter" || e.type === "dragover") {
-			setDragActive(true);
-		} else if (e.type === "dragleave") {
-			setDragActive(false);
-		}
+		setDragActive(e.type === "dragenter" || e.type === "dragover");
 	};
 
 	const handleDrop = (e) => {
@@ -35,15 +32,28 @@ const FileUpload = () => {
 	};
 
 	const handleUpload = async () => {
+		if (files.length === 0) {
+			alert("Please select files to upload!");
+			return;
+		}
+
 		setUploadStatus("Uploading...");
+		setServerResponse(null);
 
-		const result = await uploadFiles(files);
+		try {
+			const email = localStorage.getItem("email");
+			const result = await uploadFiles(files, email);
 
-		if (result.success) {
-			setUploadStatus("Upload successful!");
-			setFiles([]); // Clear files after successful upload
-		} else {
-			setUploadStatus(`Upload failed: ${result.message}`);
+			if (result.success) {
+				setUploadStatus("Upload successful!");
+				setFiles([]); // Clear files after successful upload
+				setServerResponse(result.data); // Store JSON response
+			} else {
+				setUploadStatus(`Upload failed: ${result.message}`);
+			}
+		} catch (error) {
+			console.error("Upload error:", error);
+			setUploadStatus("Upload failed. Please try again.");
 		}
 	};
 
@@ -71,6 +81,7 @@ const FileUpload = () => {
 					</div>
 				</div>
 
+				{/* Selected Files List */}
 				{files.length > 0 && (
 					<div className='mt-8'>
 						<h3 className='text-xl font-semibold text-white mb-4'>Selected Files</h3>
@@ -95,17 +106,48 @@ const FileUpload = () => {
 					</div>
 				)}
 
+				{/* Upload Status */}
 				{uploadStatus && (
 					<div
 						className={`mt-4 p-3 rounded-lg ${
 							uploadStatus.includes("failed")
 								? "bg-red-900/50 text-red-200"
-								: uploadStatus.includes("successful")
-								? "bg-green-900/50 text-green-200"
 								: "bg-blue-900/50 text-blue-200"
 						}`}
 					>
 						{uploadStatus}
+					</div>
+				)}
+
+				{/* Server Response - Display Encrypted File Info */}
+				{serverResponse && (
+					<div className='mt-6 p-4 bg-gray-900 rounded-lg'>
+						<h3 className='text-lg font-semibold text-green-400'>
+							✅ File Encrypted Successfully!
+						</h3>
+						<p className='text-gray-300'>
+							<strong>🔒 Encrypted Filename:</strong> {serverResponse.encrypted_filename}
+						</p>
+						<p className='text-gray-300'>
+							<strong>🔑 Encryption Key:</strong>{" "}
+							<span className='font-mono bg-gray-800 px-2 py-1 rounded'>
+								{serverResponse.encryption_key}
+							</span>
+						</p>
+						<p className='text-gray-300'>
+							<strong>📥 Download Encrypted File:</strong>{" "}
+							<a
+								href={serverResponse.download_url}
+								target='_blank'
+								rel='noopener noreferrer'
+								className='text-blue-400 underline hover:text-blue-300'
+							>
+								Click here to download
+							</a>
+						</p>
+						<p className='text-red-400 text-sm mt-2'>
+							⚠ Save this key securely! It will NOT be stored on the server.
+						</p>
 					</div>
 				)}
 			</div>

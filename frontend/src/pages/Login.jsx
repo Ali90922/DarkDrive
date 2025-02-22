@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { loginUser } from "../api/auth";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
+	const navigate = useNavigate();
 	const [formData, setFormData] = useState({ email: "", password: "" });
 	const [error, setError] = useState("");
 	const [loading, setLoading] = useState(false);
@@ -17,21 +19,26 @@ const LoginPage = () => {
 
 		try {
 			const result = await loginUser(formData);
-			if (!result.success) {
-				setError(result.error);
+
+			if (result.message == "Login successful") {
+				// If we got a token, login was successful
+				const email = result.email;
+				console.log(result);
+				localStorage.setItem("email", email);
+				navigate("/");
 			} else {
-				// Handle successful login (redirect, store token, etc.)
-				console.log("Login successful");
+				setError("Login failed - no token received");
 			}
 		} catch (err) {
-			setError("An error occurred during login");
+			console.error("Error:", err);
+			setError(err.message || "An error occurred during login");
 		} finally {
 			setLoading(false);
 		}
 	};
 
 	return (
-		<div className='flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white'>
+		<div className='flex flex-col items-center pt-8 min-h-screen bg-gray-900 text-white'>
 			<h1 className='text-3xl font-bold mb-4'>Welcome to DarkDrive</h1>
 			<p className='text-gray-400 mb-6'>
 				Login and upload your files, safe and secure, completely free!

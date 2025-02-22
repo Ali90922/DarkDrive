@@ -32,6 +32,10 @@ axios.interceptors.request.use(
 export const loginUser = async (userData) => {
 	try {
 		const response = await axios.post(`${API_URL}/users/login`, userData);
+		// Save token to localStorage if login successful
+		if (response.data.token) {
+			localStorage.setItem("userToken", response.data.token);
+		}
 		return response.data;
 	} catch (err) {
 		throw err.response.data;
