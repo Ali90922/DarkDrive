@@ -27,11 +27,13 @@ const Home = () => {
 
   // Function to download file using axios from the separate download API
   const handleDownload = async (file) => {
+    console.log("handleDownload called for file:", file);
     try {
-      const response = await axios.get(
-        `${DOWNLOAD_API_URL}/download/${encodeURIComponent(file)}`,
-        { responseType: "blob" } // important for handling binary data
-      );
+      const downloadUrl = `${DOWNLOAD_API_URL}/download/${encodeURIComponent(file)}`;
+      console.log("Calling download API at:", downloadUrl);
+      const response = await axios.get(downloadUrl, { responseType: "blob" });
+      console.log("Download API response received:", response);
+
       // Create a URL from the blob
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
