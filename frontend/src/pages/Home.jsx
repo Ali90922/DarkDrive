@@ -5,14 +5,17 @@ import axios from "axios";
 const Home = () => {
   const [files, setFiles] = useState([]);
 
+  // Adjust if your FastAPI is hosted differently
   const API_URL = "http://18.220.232.235:8000";
 
   useEffect(() => {
     const getUserData = async () => {
       try {
-        const response = await axios.get(
-          `${API_URL}/users/files/${localStorage.getItem("email")}`
-        );
+        // We assume the server is running the new route
+        // "GET /users/files/:email"
+        const email = localStorage.getItem("email") || "demo@example.com";
+        const response = await axios.get(`${API_URL}/users/files/${email}`);
+        // The server returns something like { files: ["JD-Q2.asm.enc", "test.txt.enc", ...] }
         console.log(response.data.files);
         setFiles(response.data.files);
       } catch (err) {
@@ -38,10 +41,12 @@ const Home = () => {
                 key={index}
                 className="flex justify-between p-2 border-b border-gray-600 last:border-b-0 hover:bg-gray-700 transition"
               >
+                {/* Show the exact filename, e.g. "JD-Q2.asm.enc" */}
                 <p>{file}</p>
                 <a
+                  // Must request EXACT name, including ".enc"
                   href={`${API_URL}/download/${encodeURIComponent(file)}`}
-                  download={file}
+                  download={file} 
                   className="text-blue-400 cursor-pointer"
                 >
                   Download
