@@ -1,3 +1,7 @@
+
+![Dark Drive Website Image](Assets/Cover.jpg)
+
+
 # 🚀 DarkDrive - The Future of Secure File Sharing
 
 DarkDrive is not just another file-sharing platform—it's a fortress for your data. Designed to be **ultra-secure, highly resilient, and completely private**, DarkDrive ensures that your files remain accessible to **you and only you**. 
