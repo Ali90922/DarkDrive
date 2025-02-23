@@ -1,5 +1,5 @@
 
-![Dark Drive Website Image](Assets/Cover.jpg)
+![Dark Drive Website Image](Assets/Cover2.jpg)
 
 
 # 🚀 DarkDrive - The Future of Secure File Sharing
