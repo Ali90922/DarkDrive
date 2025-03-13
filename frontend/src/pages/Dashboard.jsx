@@ -78,8 +78,8 @@ const Dashboard = () => {
 	};
 
 	return (
-		<main className='flex'>
-			<section>
+		<main className='flex flex-col md:flex-row md:flex-grow'>
+			<section className='flex flex-col flex-grow'>
 				<FileUpload />
 			</section>
 			<section className='p-6 w-5/6'>
@@ -106,7 +106,7 @@ const Dashboard = () => {
 							</li>
 						))
 					) : (
-						<p>Add files to show.</p>
+						<p className='text-lg font-bold'>Upload and securely store your files.</p>
 					)}
 				</ul>
 			</section>

@@ -56,11 +56,11 @@ const FileUpload = () => {
 	};
 
 	return (
-		<div className='bg-primary h-screen p-8'>
-			<div>
+		<div className='bg-primary p-8 h-full flex flex-col flex-1'>
+			<div className='h-full flex flex-grow'>
 				<div
 					className={`${dragActive ? "bg-primary" : "bg-primary/50"}
-						border-tertiary border-2 p-8 text-center border-dashed rounded-lg transition-colors duration-200
+						border-tertiary border-2 p-8 flex text-center items-center justify-center border-dashed flex-grow rounded-lg transition-colors duration-200
 					`}
 					onDragEnter={handleDrag}
 					onDragLeave={handleDrag}

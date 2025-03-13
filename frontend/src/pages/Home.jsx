@@ -7,13 +7,13 @@ const Home = () => {
 		<>
 			<span
 				style={{ backgroundImage: `url(${LandingImage})` }}
-				className='flex bg-cover bg-center h-[42rem] items-center'
+				className='flex bg-cover bg-center h-[44rem] items-center'
 			>
-				<h4 className='text-black font-bold text-center text-[14rem] w-full font-display'>
+				<h4 className='text-black font-bold text-center text-8xl sm:text-[14rem] w-full font-display'>
 					DARK DRIVE
 				</h4>
 			</span>
-			<section className='grid grid-cols-2 gap-8 py-8'>
+			<section className='grid md:grid-cols-2 items-center justify-center gap-8 py-8'>
 				<aside className='flex flex-col items-center justify-center p-8'>
 					<div className='flex flex-col gap-8 rounded-3xl p-8 py-12 backdrop-blur-sm'>
 						<h1 className='text-accent'>What is DarkDrive?</h1>
@@ -29,7 +29,7 @@ const Home = () => {
 						</p>
 					</div>
 				</aside>
-				<aside className='grid grid-cols-2 grid-rows-2 items-center justify-center'>
+				<aside className='flex flex-col lg:grid lg:grid-cols-2 lg:grid-rows-2 gap-8 items-center justify-center w-full'>
 					<Card
 						icon='fa-solid fa-upload'
 						heading='Seamless Secure Upload'
