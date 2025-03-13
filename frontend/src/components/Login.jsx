@@ -42,7 +42,7 @@ const LoginPage = () => {
 
 	return (
 		<form
-			className='flex flex-col gap-8 bg-primary/40 backdrop-blur-sm p-8 rounded-xl w-1/4 border-white/40 border-[1px]'
+			className='flex flex-col gap-8 bg-primary/40 backdrop-blur-sm p-8 rounded-xl w-[90%] max-w-[425px] border-white/40 border-[1px]'
 			onSubmit={handleSubmit}
 		>
 			<h2 className='font-bold'>Login</h2>

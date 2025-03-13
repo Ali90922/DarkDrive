@@ -27,7 +27,7 @@
 	}
 
 	nav {
-		@apply bg-primary flex justify-between items-center px-16;
+		@apply bg-primary flex justify-between items-center px-8 sm:px-16;
 	}
 
 	nav ul {
