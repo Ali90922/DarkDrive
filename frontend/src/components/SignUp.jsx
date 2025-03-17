@@ -49,7 +49,7 @@ const SignUpPage = () => {
 	return (
 		<>
 			<form
-				className={`flex flex-col gap-8 bg-primary/40 backdrop-blur-sm p-8 rounded-xl w-1/4 border-[1px] border-white/40 ${
+				className={`flex flex-col gap-8 bg-primary/40 backdrop-blur-sm p-8 rounded-xl w-[90%] max-w-[425px] border-[1px] border-white/40 ${
 					showModal && "blur-2xl"
 				}`}
 				onSubmit={handleSubmit}
