@@ -24,7 +24,7 @@ const LoginPage = () => {
 		try {
 			const result = await loginUser(formData);
 
-			if (result.message === "Login successful") {
+			if (result.ok) {
 				const email = result.email;
 				console.log(result);
 				localStorage.setItem("email", email);
@@ -34,7 +34,7 @@ const LoginPage = () => {
 			}
 		} catch (err) {
 			console.error("Error:", err);
-			setError(err.message || "An error occurred during login");
+			setError(err.detail || "An error occurred during login");
 		} finally {
 			setLoading(false);
 		}
