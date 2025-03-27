@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
+
 const Navbar = () => {
 	const MOBILE_WIDTH = 768;
 	const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_WIDTH);
@@ -14,6 +15,7 @@ const Navbar = () => {
 			setIsMobile(mobile);
 			if (!mobile) {
 				setMenuOpen(false); // Close the menu on larger screens
+
 			}
 		};
 		window.addEventListener("resize", handleResize);
@@ -45,6 +47,7 @@ const Navbar = () => {
 				{isMobile ? (
 					<button
 						onClick={handleMenuToggle} // Trigger menu toggle
+
 						className='focus:outline-none rounded-none py-8'
 					>
 						{menuOpen ? <X size={28} /> : <Menu size={28} />}
@@ -93,6 +96,7 @@ const Navbar = () => {
 						</motion.ul>
 					)}
 				</AnimatePresence>
+
 			)}
 		</>
 	);
