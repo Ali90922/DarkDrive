@@ -1,6 +1,8 @@
-import React, { useState, useEffect, isValidElement } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+
 
 const Navbar = () => {
 	const MOBILE_WIDTH = 768;
@@ -12,7 +14,8 @@ const Navbar = () => {
 			const mobile = window.innerWidth < MOBILE_WIDTH;
 			setIsMobile(mobile);
 			if (!mobile) {
-				setMenuOpen(false);
+				setMenuOpen(false); // Close the menu on larger screens
+
 			}
 		};
 		window.addEventListener("resize", handleResize);
@@ -24,15 +27,27 @@ const Navbar = () => {
 		{ name: "Login", path: "/login" },
 	];
 
+	// Function to handle opening and closing the menu
+	const handleMenuToggle = () => {
+		if (menuOpen) {
+			// If the menu is open, close it with an animation
+			setMenuOpen(false); // We'll rely on the exit animation to finish first
+		} else {
+			// If the menu is closed, open it immediately
+			setMenuOpen(true);
+		}
+	};
+
 	return (
 		<>
-			<nav>
+			<nav className='z-10'>
 				<Link to='/'>
-					<h1 className='font-display'>DarkDrive</h1>
+					<h1 className='font-display'>Dark Drive</h1>
 				</Link>
 				{isMobile ? (
 					<button
-						onClick={() => setMenuOpen(!menuOpen)}
+						onClick={handleMenuToggle} // Trigger menu toggle
+
 						className='focus:outline-none rounded-none py-8'
 					>
 						{menuOpen ? <X size={28} /> : <Menu size={28} />}
@@ -54,20 +69,34 @@ const Navbar = () => {
 				)}
 			</nav>
 
-			{isMobile && menuOpen && (
-				<ul className='bg-primary'>
-					{navLinks.map((link) => (
-						<Link
-							key={link.name}
-							to={link.path}
-							className={`p-8 flex flex-col items-center justify-center text-xl ${
-								link.name === "Login" && "bg-accent text-primary"
-							}`}
+			{/* Menu rendering when mobile and open */}
+			{isMobile && (
+				<AnimatePresence>
+					{menuOpen && (
+						<motion.ul
+							initial={{ y: -200 }}
+							animate={{ y: 0 }}
+							exit={{ y: -200 }}
+							transition={{ duration: 0.3, ease: "easeInOut" }}
+							className='absolute top-22 left-0 w-full bg-primary'
 						>
-							{link.name}
-						</Link>
-					))}
-				</ul>
+							{navLinks.map((link) => (
+								<motion.li key={link.name}>
+									<Link
+										to={link.path}
+										className={`p-8 flex flex-col items-center justify-center text-xl ${
+											link.name === "Login" && "bg-accent text-primary"
+										}`}
+										onClick={() => setMenuOpen(false)} // Optionally close menu when a link is clicked
+									>
+										{link.name}
+									</Link>
+								</motion.li>
+							))}
+						</motion.ul>
+					)}
+				</AnimatePresence>
+
 			)}
 		</>
 	);

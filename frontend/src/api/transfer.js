@@ -3,8 +3,10 @@ import axios from "axios";
 const FILE_API_URL = import.meta.env.VITE_FILE_API_URL;
 const AUTH_API_URL = import.meta.env.VITE_AUTH_API_URL;
 
-const uploadEndpoint = `${FILE_API_URL}/upload/`;
-const fileNameEndpoint = `${AUTH_API_URL}/users/upload/`;
+// const fileNameEndpoint = `${AUTH_API_URL}/users/upload/`;
+const fileNameEndpoint = `http://127.0.0.1:8000/users/upload/`;
+// const uploadEndpoint = `${FILE_API_URL}/upload/`;
+const uploadEndpoint = `http://127.0.0.1:8001/upload/${localStorage.getItem("email")}`;
 
 export const uploadFiles = async (files) => {
 	try {

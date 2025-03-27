@@ -57,7 +57,7 @@ const FileUpload = () => {
 
 	return (
 		<div className='bg-primary p-8 h-full flex flex-col flex-1'>
-			<div className='h-full flex flex-grow'>
+			<div className='h-full flex flex-grow flex-col'>
 				<div
 					className={`${dragActive ? "bg-primary" : "bg-primary/50"}
 						border-tertiary border-2 p-8 flex text-center items-center justify-center border-dashed flex-grow rounded-lg transition-colors duration-200
@@ -93,7 +93,7 @@ const FileUpload = () => {
 							))}
 						</div>
 
-						<button onClick={handleUpload} className='mt-4'>
+						<button onClick={handleUpload} className='mt-4 w-full'>
 							Upload Files
 						</button>
 					</div>

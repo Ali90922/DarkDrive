@@ -23,12 +23,29 @@ const SignUpPage = () => {
 		e.preventDefault();
 		setError("");
 
+		if (formData.password.length < 8) {
+			setError("Password must be at least 8 characters long");
+			return;
+		}
+
+		const hasUpperCase = /[A-Z]/.test(formData.password);
+		const hasLowerCase = /[a-z]/.test(formData.password);
+		const hasSymbol = /[!@#$%^&*(),.?":{}|<>]/.test(formData.password);
+
+		if (!hasUpperCase || !hasLowerCase || !hasSymbol) {
+			setError(
+				"Password must contain at least one uppercase letter, one lowercase letter, and one symbol."
+			);
+			return;
+		}
+
 		if (formData.password !== formData.confirmPassword) {
 			setError("Passwords do not match");
 			return;
 		}
 
 		setLoading(true);
+
 		try {
 			const result = await signupUser(formData);
 			if (!result.success) {
@@ -89,6 +106,15 @@ const SignUpPage = () => {
 						required
 					/>
 				</span>
+				<div className='text-white/50 text-sm'>
+					Password must:
+					<ul className='list-disc pl-4'>
+						<li>be at least 8 characters long.</li>
+						<li>contain at least 1 lowercase letter.</li>
+						<li>contain at least 1 uppercase letter.</li>
+						<li>contain at least 1 special character (!, @, #, etc.).</li>
+					</ul>
+				</div>
 				{error && <p className='text-red-500 text-sm'>{error}</p>}
 				<button type='submit' disabled={loading}>
 					{loading ? "Signing up..." : "Sign Up"}

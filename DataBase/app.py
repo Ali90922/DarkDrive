@@ -28,7 +28,6 @@ def get_db_connection():
 class User(BaseModel):
     email: str
     password: str
-    linkedin: str = None
     files: str = None
 
 # Password Hashing Functions
@@ -68,16 +67,16 @@ def signup(user: User):
         conn.close()
         raise HTTPException(status_code=400, detail="Email already registered")
 
-    # Hash password and insert user with `verified = 0`
+    # Hash password and insert user with verified = 0
     hashed_password = hash_password(user.password)
-    cursor.execute("INSERT INTO users (email, password, linkedin, files, verified) VALUES (?, ?, ?, ?, ?)",
-                   (user.email, hashed_password, user.linkedin, user.files, 0))
+    cursor.execute("INSERT INTO users (email, password, files, verified) VALUES (?, ?, ?, ?)",
+                   (user.email, hashed_password, user.files, 0))
     conn.commit()
     conn.close()
 
-    send_verification_email(user.email)  # Send verification email
+    send_verification_email(user.email)
 
-    return {"message": "Signup successful! Please verify your email."}
+    return {"ok": True }
 
 # ✅ Verify Email Endpoint
 @app.get("/users/verify/{email}")
@@ -117,28 +116,28 @@ def login(user: User):
 
     conn.close()
     
-    return {"message": "Login successful", "email": user.email}
+    return {"ok": True, "email": user.email}
 
-# ✅ Get All Users
+# Get All Users
 @app.get("/users")
 def get_users():
     conn = get_db_connection()
-    users = conn.execute("SELECT id, email, linkedin, files, verified FROM users").fetchall()
+    users = conn.execute("SELECT id, email, files, verified FROM users").fetchall()
     conn.close()
     return {"users": [dict(user) for user in users]}
 
-# ✅ Get a User by Email
+# Get a User by Email
 @app.get("/users/{email}")
 def get_user(email: str):
     conn = get_db_connection()
     cursor = conn.cursor()
-    user = cursor.execute("SELECT id, email, linkedin, files, verified FROM users WHERE email = ?", (email,)).fetchone()
+    user = cursor.execute("SELECT id, email, files, verified FROM users WHERE email = ?", (email,)).fetchone()
     conn.close()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return dict(user)
 
-# ✅ Delete a User by Email
+# Delete a User by Email
 @app.delete("/users/delete/{email}")
 def delete_user(email: str):
     conn = get_db_connection()
@@ -155,7 +154,7 @@ def delete_user(email: str):
     
     return {"message": "User deleted successfully"}
 
-# ✅ Delete All Users & Reset ID Counter
+# Delete All Users & Reset ID Counter
 @app.delete("/users/clear")
 def clear_users():
     conn = get_db_connection()
@@ -170,7 +169,7 @@ def clear_users():
     return {"message": "All users deleted and ID counter reset"}
 
 
-# ✅ Upload File for a Specific User
+# Upload File for a Specific User
 @app.post("/users/upload/{email}")
 def upload_file(email: str, file: UploadFile = File(...)):
     """
@@ -196,7 +195,40 @@ def upload_file(email: str, file: UploadFile = File(...)):
     conn.commit()
     conn.close()
 
-    return {"message": "Filename stored successfully", "filename": file.filename}
+    return {"ok": True, "message": "Filename stored successfully", "filename": file.filename}
+
+# Delete a file
+@app.delete("/users/files/delete/{email}/{filename}")
+def delete_file(email: str, filename: str):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Check if user exists
+    user = cursor.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
+    if not user:
+        conn.close()
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Check if file exists
+    existing_files = user["files"]
+    if not existing_files:
+        conn.close()
+        raise HTTPException(status_code=404, detail="No files found for this user")
+    
+    files_list = existing_files.split(",")
+    if filename not in files_list:
+        conn.close()
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    files_list.remove(filename)
+    updated_files = ",".join(files_list) if files_list else None
+
+    # Update the database
+    cursor.execute("UPDATE users SET files = ? WHERE email = ?", (updated_files, email))
+    conn.commit()
+    conn.close()
+
+    return {"ok": True, "message": f"File '{filename}' deleted successfully"}
 
 @app.get("/users/files/{email}")
 def get_user_files(email: str):
@@ -223,4 +255,4 @@ def get_user_files(email: str):
       # Also retrieve the verified status (0 or 1)
     verified_status = user["verified"]  # This is typically 0 or 1 in the DB    
     # Return a JSON object, e.g. { "files": ["file1.pdf", "file2.png"] }
-    return {"files": files_list,"verified": verified_status}
+    return {"files": files_list, "verified": verified_status}
